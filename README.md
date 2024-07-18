@@ -15,6 +15,6 @@ Javacript implementation, aiming for shortness (#js13kgames)
 
 ## Demos
 
-- [projectiles](demos/4-projectiles/index.html)
-- [fireworks](demos/4-fireworks/index.html)
+- [projectiles](https://xem.github.io/mini3Dphysics/demos/4-projectiles/index.html)
+- [fireworks](https://xem.github.io/mini3Dphysics/demos/4-fireworks/index.html)
 
