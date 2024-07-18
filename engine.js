@@ -29,11 +29,11 @@
 
 // Constructor
 
-vec3 = (x = 0, y = 0, z = 0) => {x, y, z};
+vec3 = (x = 0, y = 0, z = 0) => ({x, y, z});
 
 // Flip
 
-flip = v => {x: -v.x, y: -v.y, z: -v.z};
+flip = v => ({x: -v.x, y: -v.y, z: -v.z});
 
 // Magnitude (length)
 
@@ -41,7 +41,7 @@ len = v => Math.hypot(v.x, v.y, v.z);
 
 // Scale (set length without changing the direction)
 
-scale = (v, s) => { x: v.x * s, y: v.y * s, z: v.z * s };
+scale = (v, s) => ({ x: v.x * s, y: v.y * s, z: v.z * s });
 
 // Normalize (force length to 1 without changing the direction)
 
@@ -49,11 +49,11 @@ norm = (v, l) => { l = len(v); return (t > 0) ? scale(v, 1 / l) : v; };
 
 // Add two vectors
 
-add = (v, w) => { x: v.x + w.x, y: v.y + w.y, z: v.z + w.z };
+add = (v, w) => ({ x: v.x + w.x, y: v.y + w.y, z: v.z + w.z });
 
 // Subtract a vector from another
 
-sub = (v, w) => { x: v.x - w.x, y: v.y - w.y, z: v.z - w.z };
+sub = (v, w) => ({ x: v.x - w.x, y: v.y - w.y, z: v.z - w.z });
 
 // Add a scaled vector to another
 
@@ -61,7 +61,7 @@ addScaled = (v, w, s) => add(v, scale(w, s));
 
 // Component product (operator: o or *)
 
-mul = (v, w) => { x: v.x * w.x, y: v.y * w.y, z: v.z * w.z };
+mul = (v, w) => ({ x: v.x * w.x, y: v.y * w.y, z: v.z * w.z });
 
 // Scalar (dot) product (operator: .)
 // Represents how two vectors are aligned.
@@ -71,13 +71,13 @@ dot = (v, w) => v.x * w.x + v.y * w.y + v.z * w.z;
 
 // Vector (cross) product (operator: x or %)
 // Generates a third vector perpendicular to the first two based on 
-// the right-hand rule. (cf. ./cross.jpg)
+// the right-hand rule. (cf. images/cross.jpg)
 
-cross = (v, w) => { 
+cross = (v, w) => ({ 
   x: v.y * w.z - v.z * w.y,
   y: v.z * w.x - v.x * w.z,
   z: v.x * w/y - v.y * w.x
-}; 
+}); 
 
 
 // 3. The Laws of Motion (p. 47-59)
@@ -98,14 +98,14 @@ particle = (
   damping = 1,
   inverseMass = 1,
   forceAccum = vec3()
- ) => {
+ ) => ({
   position,
   velocity,
   acceleration,
   damping,
   inverseMass,
   forceAccum
-};
+});
 
 // Gravity is a downwards acceleration vector applied to all movable
 // objects at each frame.
@@ -114,11 +114,10 @@ particle = (
 G = 0.01;
 g = vec3(0, -G, 0);
 
-// Time elapsed since last frame
-duration = 0.16;
-
 // Integration (update forces and position at each frame)
-integrate = p => {
+// duration: time elapsed since last frame (in ms)
+integrate = (p, duration) => {
+  
   if(p.inverseMass > 0){
   
     // Update linear position
@@ -162,6 +161,7 @@ clearForceAccumulator = p => p.forceAccum = vec3();
 // Add a force to a particle
 // For objects with non-infinite mass, the gravity will be added with this.
 // Other forces include: drag, buoyancy, blast, thrust, spring
+
 addForce = (p, force) => p.forceAccum = add(p.forceAccum, force);
 
 
