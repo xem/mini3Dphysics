@@ -142,7 +142,7 @@ integrate = (p, duration) => {
 // -----------------------------------------
 
 // This chapter shows how to implement projectiles and fireworks.
-// More infos in the demos folder
+// More info in the readme file and the demos folder.
 
 // =============================================
 //  Part II: Mass Aggregate Physics (p. 75-154)

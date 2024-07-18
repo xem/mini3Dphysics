@@ -1,0 +1,45 @@
+<script src="../../engine.js"></script>
+
+<canvas id=canvas width=640 height=480></canvas>
+
+<script>
+
+c = canvas.getContext("2d");
+
+particles = [];
+
+
+// Render loop
+setInterval(() => {
+
+  // Reset canvas
+  canvas.width = canvas.width;
+
+  // Create pistol bullet
+  particles.push(particle(
+    vec3(320, 10, 0), // position
+    vec3((Math.random() - 0.5) * 40, Math.random() * 10 + 60, 0),  // velocity
+    vec3(0,-5,0),     // acceleration
+    0.99,             // damping
+    1/2               // inverseMass
+  ));
+
+
+  // Limit to 1000 particles
+  if(particles.length > 1000) particles.shift();
+  
+  for(p of particles){
+
+    // Integrate
+    integrate(p, 0.016);
+  
+    // Draw
+    c.fillRect(p.position.x, 480 - p.position.y, 2, 2);
+  }
+
+}, 16);
+</script>
+
+<style>
+canvas { background: #ddd }
+</style>
