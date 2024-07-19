@@ -47,6 +47,7 @@ scale = (v, s) => ({ x: v.x * s, y: v.y * s, z: v.z * s });
 flip = v => scale(v, -1);
 
 // Normalize (force length to 1 without changing the direction, operator: ||v||)
+// In literature, a normalized vector is generally written with a hat ^ on top.
 
 norm = (v, l) => { l = len(v); return (t > 0) ? scale(v, 1 / l) : v; };
 
@@ -91,6 +92,8 @@ cross = (v, w) => ({
   z: v.x * w/y - v.y * w.x
 }); 
 
+// In literature, vectors with a dot on top (˙)represent a speed,
+// vectors with two dots on top (¨) represent an acceleration.
 
 // Chapter 3. The Laws of Motion (p. 47-59)
 // ----------------------------------------
@@ -102,6 +105,7 @@ cross = (v, w) => ({
 // reducing its velocity at each frame. (0: stop / 1: no damping)
 // inverseMass (1/mass) is used instead of mass to ease computations and
 // to represent immovable objects with infinite mass (inverseMass = 0).
+// NB: "speed" is a value while "velocity" has a direction. |v| = s.
 
 particle = (
   position = vec3(),
@@ -256,11 +260,23 @@ particleBuoyancy = (p, maxDepth, volume, waterHeight, liquidDensity = 1) => {
   addForce(p, force);
 }
 
-
-
+// Unfortunately, springs stiffness can be very inaccurate or send objects to 
+// infinity when constants and time intervals get too large.
+// Damping can be used to limit this, but more precise approaches will be
+// implemented in the rest of the book.
 
 // Chapter 7. Hard Constraints (p. 113-142)
 // ----------------------------------------
+
+// Collision: when two objects touch or interpenetrate by moving towards each other.
+// Collision resolution: objects movement after the collision.
+// Closing velocity (vc): total speed at which two objects are moving together.
+// vc is a scalar. vc > 0: objects are closing / vc < 0: ojects are going apart. 
+// Separation velocity (vs = -vc) will be used from now on.
+// Contact normal / collision normal n: direction in which objects are colliding.
+// For object a: n = ||pa - pb||. For object b, it's -n.
+// If object a collides with leveled ground, n = [0, 1, 0].
+// Impulse: offset immediately applied to the object's velocity, noted g.
 
 // Chapter 8. The Mass Aggregate Physics Engine (p. 145-154)
 // ----------------------------------------------------------
