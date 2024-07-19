@@ -21,4 +21,6 @@ Javacript implementation, aiming for shortness (#js13kgames)
 - [projectiles](https://xem.github.io/mini3Dphysics/demos/4-projectiles/index.html)
 - [fireworks](https://xem.github.io/mini3Dphysics/demos/4-fireworks/index.html)
 
-### WIP
+### Chapter 6
+
+- [buoyancy](https://xem.github.io/mini3Dphysics/demos/6-buoyancy/index.html)

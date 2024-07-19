@@ -15,18 +15,18 @@ setInterval(() => {
   // Reset canvas
   canvas.width = canvas.width;
 
-  // Create pistol bullet
+  // Create particles
   particles.push(particle(
     vec3(320, 10, 0), // position
-    vec3((Math.random() - 0.5) * 40, Math.random() * 10 + 60, 0),  // velocity
+    vec3((Math.random() - 0.5) * 40, Math.random() * 20 + 70, 0),  // velocity
     vec3(0,-5,0),     // acceleration
     0.99,             // damping
     1/2               // inverseMass
   ));
 
 
-  // Limit to 1000 particles
-  if(particles.length > 1000) particles.shift();
+  // Limit to 800 particles
+  if(particles.length > 800) particles.shift();
   
   for(p of particles){
 

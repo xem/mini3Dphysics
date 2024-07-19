@@ -10,34 +10,34 @@ c = canvas.getContext("2d");
 pistol = particle(
   vec3(10, 450, 0), // position
   vec3(100, 0, 0),  // velocity
-  vec3(0,-1,0),     // acceleration
+  vec3(),
   0.99,             // damping
-  1/2               // inverseMass
+  1/.1              // inverseMass
 );
 
 // Create artillery
 artillery = particle(
   vec3(10, 400, 0), // position
-  vec3(80, 0, 0),   // velocity
-  vec3(0,-20,0),    // acceleration
+  vec3(80, 40, 0),   // velocity
+  vec3(),
   0.99,             // damping
-  1/200             // inverseMass
+  1/20              // inverseMass
 );
 
 // Create fireball
 fireball = particle(
   vec3(10, 350, 0), // position
   vec3(30, 0, 0),   // velocity
-  vec3(0, 2, 0),    // acceleration
+  vec3(),
   0.9,              // damping
-  1                 // inverseMass
+  1/-1              // inverseMass
 );
 
 // Create laser beam
 laser = particle(
   vec3(10, 300, 0), // position
   vec3(300, 0, 0),  // velocity
-  vec3(0, 0, 0),    // acceleration (no gravity)
+  vec3(),
   0.99,             // damping
   1/.1              // inverseMass
 );

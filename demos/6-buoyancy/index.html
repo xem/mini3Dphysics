@@ -1,0 +1,63 @@
+<script src="../../engine.js"></script>
+
+<canvas id=canvas width=640 height=480></canvas>
+
+<script>
+
+c = canvas.getContext("2d");
+
+// Create boat
+boat = particle(
+  vec3(170, 100, 0),  // position
+  vec3(),             // velocity
+  vec3(),
+  0.8,                // damping
+  1/100               // inverseMass
+);
+
+boat2 = particle(
+  vec3(320, 0, 0),    // position
+  vec3(),             // velocity
+  vec3(),
+  0.8,                // damping
+  1/100               // inverseMass
+);
+
+boat3 = particle(
+  vec3(470, -100, 0), // position
+  vec3(),             // velocity
+  vec3(),
+  0.8,                // damping
+  1/100               // inverseMass
+);
+
+// Render loop
+setInterval(() => {
+
+  // Reset canvas
+  canvas.width = canvas.width;
+  
+  // Draw water
+  c.fillRect(0,240,640,1);
+  
+  // Apply force
+  particleBuoyancy(boat, 25, 100, 0, 3);
+  particleBuoyancy(boat2, 25, 100, 0, 3);
+  particleBuoyancy(boat3, 25, 100, 0, 3);
+  
+  // Integrate
+  integrate(boat, 0.016);
+  integrate(boat2, 0.016);
+  integrate(boat3, 0.016);
+  
+  // Draw
+  c.fillRect(boat.position.x - 50, 480 - boat.position.y - 50 - 240, 100, 100);
+  c.fillRect(boat2.position.x - 50, 480 - boat2.position.y - 50 - 240, 100, 100);
+  c.fillRect(boat3.position.x - 50, 480 - boat3.position.y - 50 - 240, 100, 100);
+
+}, 16);
+</script>
+
+<style>
+canvas { background: #ddd }
+</style>

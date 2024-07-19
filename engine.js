@@ -1,4 +1,4 @@
-// +===================================================================+
+﻿// +===================================================================+
 // |                         MINI 3D PHYSICS                           |
 // +===================================================================+
 // | This project aims to summarize and implement contents of the book |
@@ -6,23 +6,26 @@
 // | into a small 3D physics engine useable in golfed JS games & demos |
 // +===================================================================+
 
+// Chapter 1: Introduction (p. 1 - 12)
+// -----------------------------------
+
+// - Intro to physics engines
+// - Maths level required: basic trigonometry, 3D coordinates system
+
+//       /|                         Y
+//      / |                         |   .(2,2,1)
+//     /  |     b = a sinθ          | 
+//  a /   | b   c = a cosθ        o |_ _ _ X
+//   /    |     b = c tanθ         /
+//  /_θ_ _|                       /
+//     c                         Z 
+
 // =====================================
 //  Part I: Particle Physics (p. 15-73)
 // =====================================
 
-// 2. The Maths of Particles (p. 17-45)
-// ------------------------------------
-
-// World coordinates axis (X, Y, Z)
-
-//     Y
-//     |
-//     |
-//   o |_ _ _ X
-//     /
-//    /
-//   Z 
-
+// Chapter 2. The Maths of Particles (p. 17-45)
+// --------------------------------------------
 
 // A 3D vector (a = {x, y, z}) can represent the coordinates of a point 
 // in 3D space or a direction (offset) between two points.
@@ -31,19 +34,19 @@
 
 vec3 = (x = 0, y = 0, z = 0) => ({x, y, z});
 
-// Flip
-
-flip = v => ({x: -v.x, y: -v.y, z: -v.z});
-
-// Magnitude (length)
+// Magnitude (length, operator: |v|)
 
 len = v => Math.hypot(v.x, v.y, v.z);
 
-// Scale (set length without changing the direction)
+// Scale (set length without changing the direction, operator: *)
 
 scale = (v, s) => ({ x: v.x * s, y: v.y * s, z: v.z * s });
 
-// Normalize (force length to 1 without changing the direction)
+// Flip
+
+flip = v => scale(v, -1);
+
+// Normalize (force length to 1 without changing the direction, operator: ||v||)
 
 norm = (v, l) => { l = len(v); return (t > 0) ? scale(v, 1 / l) : v; };
 
@@ -73,6 +76,15 @@ dot = (v, w) => v.x * w.x + v.y * w.y + v.z * w.z;
 // Generates a third vector perpendicular to the first two based on 
 // the right-hand rule. (cf. images/cross.jpg)
 
+//         a x b
+//           ^
+//           | 
+//           | 
+//    a _ _ _|
+//          /
+//         /
+//        b 
+
 cross = (v, w) => ({ 
   x: v.y * w.z - v.z * w.y,
   y: v.z * w.x - v.x * w.z,
@@ -80,8 +92,8 @@ cross = (v, w) => ({
 }); 
 
 
-// 3. The Laws of Motion (p. 47-59)
-// --------------------------------
+// Chapter 3. The Laws of Motion (p. 47-59)
+// ----------------------------------------
 
 // Particle constructor
 // A particle has position, velocity and acceleration along the 3 
@@ -111,26 +123,25 @@ particle = (
 // objects at each frame.
 // (ex: position += velocity * time + acceleration * time * time * 0.5)
 
-G = 0.01;
-g = vec3(0, -G, 0);
+gravity = vec3(0, -2, 0);
 
 // Integration (update forces and position at each frame)
 // duration: time elapsed since last frame (in ms)
 integrate = (p, duration) => {
   
-  if(p.inverseMass > 0){
+  if(p.inverseMass != 0){
   
     // Update linear position
     p.position = addScaled(p.position, p.velocity, duration);
     
-    // Work out acceleration
-    var resultingAcc = p.acceleration;
-    resultingAcc = addScaled(resultingAcc, p.forceAccum, p.inverseMass);
+    // Sum forces applied to acceleration (user-defined + gravity * inverseMass)
+    addForce(p, p.acceleration);
+    addForce(p, scale(gravity, 1/p.inverseMass));
 
     // Update linear velocity
-    p.velocity = addScaled(p.velocity, resultingAcc, duration);
+    p.velocity = addScaled(p.velocity, p.forceAccum, duration);
     
-    // Drag (velocity times damping to the power of the duration, see p.57)
+    // Apply drag force to the power of deltaTime to the velocity (see p.57)
     p.velocity = scale(p.velocity, p.damping ** duration);
     
     clearForceAccumulator(p);
@@ -138,8 +149,8 @@ integrate = (p, duration) => {
 };
 
 
-// 4. The Particles Physics Engine (p. 61-73)
-// -----------------------------------------
+// Chapter 4. The Particles Physics Engine (p. 61-73)
+// --------------------------------------------------
 
 // This chapter shows how to implement projectiles and fireworks.
 // More info in the readme file and the demos folder.
@@ -148,8 +159,8 @@ integrate = (p, duration) => {
 //  Part II: Mass Aggregate Physics (p. 75-154)
 // =============================================
 
-// 5. Adding General Forces (p. 77-88)
-// -----------------------------------
+// Chapter 5. Adding General Forces (p. 77-88)
+// -------------------------------------------
 
 // D'Alembert principle: all the forces applied to an object,
 // can be summed to make a single, equivalent force.
@@ -165,15 +176,94 @@ clearForceAccumulator = p => p.forceAccum = vec3();
 addForce = (p, force) => p.forceAccum = add(p.forceAccum, force);
 
 
+// Chapter 6. Springs and Spring-Like Things (p. 89-110)
+// -----------------------------------------------------
 
-// 6. Springs and Spring-Like Things (p. 89-110)
-// ---------------------------------------------
+// ꔛ ⅏
+ 
+// Hook's law: the force of a spring depends only on its extension or 
+// compression distance. Ex: doubling the extension doubles the force
+// The spring stiffness is a constant k. Its rest length is l_0.
+// Its force is felt at both ends.
+// Force in 1D: f = -k * (l - l_0)
+// Force in 2D: f = -k * (|d| - l_0) * ||d||.
+// d is a vector between both ends, pointing to the object considered.
+// Elasticity limits (min and max deformation) can be enforced in code.
+// Spring-like things: bungee cord, buoyancy, 3rd person camera...
 
-// 7. Hard Constraints (p. 113-142)
-// --------------------------------
+// Update spring between two particles
 
-// 8. The Mass Aggregate Physics Engine (p. 145-154)
-// -------------------------------------------------
+particleSpring = (p, other, springConstant = 1, restLength = 1) => {
+  var v = sub(p.position, other.position);
+  var magnitude = -springConstant * (Math.abs(len(v)) - restLength);
+  var force = scale(norm(v), magnitude);
+  addForce(p, force);
+}
+
+// Update spring between a particle and a fixed point
+// To avoid using this, the anchor can be an immovable object.
+
+particleAnchoredSpring = (p, anchor, springConstant = 1, restLength = 1) => {
+  var v = sub(p.position, anchor);
+  var magnitude = -springConstant * (Math.abs(len(v)) - restLength);
+  var force = scale(norm(v), magnitude);
+  addForce(p, force);
+}
+
+// If a camera is bound to the game's character / vehicle with a spring,
+// be careful to avoid applying a force to the character, only to the camera.
+
+// A bungee rope only acts as a spring when it's extended
+
+particleBungee = (p, other, springConstant = 1, restLength = 1) => {
+  var v = sub(p.position, other.position);
+  if(len(v) <= restLength) return;
+  var magnitude = -springConstant * (len(v) - restLength);
+  var force = scale(norm(v), magnitude);
+  addForce(p, force);
+}
+
+// Springs can approximate buoyancy by pulling the center of mass of an object
+// to the surface of the liquid it is into. (Gravity is still present)
+// Buoyancy force:
+// - when the object is not submerged: f = 0
+// - when it is totally submerged: f = vp (liquid density * object volume)
+// - when it is partially submerged: f = dvp (d = submersion level, 0 < d < 1)
+// d=(yo-yw-s)/2s (yo: object height, yw: liquid height, s: submersion depth)
+
+particleBuoyancy = (p, maxDepth, volume, waterHeight, liquidDensity = 1) => {
+  
+  var depth = p.position.y;
+  var force;
+  
+  // Out of water
+  if(depth >= waterHeight + maxDepth){
+    return;
+  }
+  
+  // Max depth (fully submerged)
+  if(depth <= waterHeight - maxDepth){
+    force = vec3(0, liquidDensity * volume, 0);
+    addForce(p, force);
+    return;
+  }
+  // Partial submersion
+  force = vec3(
+    0,
+    - liquidDensity * volume * ((depth - maxDepth - waterHeight) / (2 * maxDepth)),
+    0
+  );
+  addForce(p, force);
+}
+
+
+
+
+// Chapter 7. Hard Constraints (p. 113-142)
+// ----------------------------------------
+
+// Chapter 8. The Mass Aggregate Physics Engine (p. 145-154)
+// ----------------------------------------------------------
 
 // ===========================================
 //  Part III: Rigid-Body Physics (p. 155-248)
