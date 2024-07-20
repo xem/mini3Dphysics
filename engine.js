@@ -11,6 +11,7 @@
 
 // - Intro to physics engines
 // - Maths level required: basic trigonometry, 3D coordinates system
+// - A "scalar" means that the value in question is a number.
 
 //       /|                         Y
 //      / |                         |   .(2,2,1)
@@ -63,11 +64,11 @@ sub = (v, w) => ({ x: v.x - w.x, y: v.y - w.y, z: v.z - w.z });
 
 addScaled = (v, w, s) => add(v, scale(w, s));
 
-// Component product (operator: o or *)
+// Component product (operator: o)
 
 mul = (v, w) => ({ x: v.x * w.x, y: v.y * w.y, z: v.z * w.z });
 
-// Scalar (dot) product (operator: .)
+// Scalar (dot) product (operator: . or *)
 // Represents how two vectors are aligned.
 // Ex: 1: same direction / 0: perpendicular / -1: opposite
 
@@ -92,20 +93,20 @@ cross = (v, w) => ({
   z: v.x * w/y - v.y * w.x
 }); 
 
-// In literature, vectors with a dot on top (˙)represent a speed,
-// vectors with two dots on top (¨) represent an acceleration.
 
 // Chapter 3. The Laws of Motion (p. 47-59)
 // ----------------------------------------
 
 // Particle constructor
-// A particle has position, velocity and acceleration along the 3 
-// world axis (x, y, z).
+// A particle has position, velocity and acceleration along the world axis x, y, z.
 // damping is an approximation of the drag force appied to the particle,
 // reducing its velocity at each frame. (0: stop / 1: no damping)
 // inverseMass (1/mass) is used instead of mass to ease computations and
 // to represent immovable objects with infinite mass (inverseMass = 0).
-// NB: "speed" is a value while "velocity" has a direction. |v| = s.
+// "speed" is a number, while "velocity" has a direction. |v| = s.
+// In literature, vectors with a dot on top (˙) represent a velocity,
+// and vectors with two dots on top (¨) represent an acceleration.
+// In this book's equations, p = p.position, p˙ = p.velocity, p¨ = p.acceleration.
 
 particle = (
   position = vec3(),
@@ -271,19 +272,154 @@ particleBuoyancy = (p, maxDepth, volume, waterHeight, liquidDensity = 1) => {
 // Collision: when two objects touch or interpenetrate by moving towards each other.
 // Collision resolution: objects movement after the collision.
 // Closing velocity (vc): total speed at which two objects are moving together.
-// vc is a scalar. vc > 0: objects are closing / vc < 0: ojects are going apart. 
+// vc is a number. vc > 0: objects are closing / vc < 0: ojects are going apart. 
+// vs = -(pa.velocity - pb.velocity) . (||pa - pb||)
 // Separation velocity (vs = -vc) will be used from now on.
+// vs = (pa.velocity - pb.velocity) . (||pa - pb||)
 // Contact normal / collision normal n: direction in which objects are colliding.
 // For object a: n = ||pa - pb||. For object b, it's -n.
 // If object a collides with leveled ground, n = [0, 1, 0].
 // Impulse: offset immediately applied to the object's velocity, noted g.
 
+// Collision processing
+// restitution is the coefficient at which the objects react to the collision.
+resolveVelocity = (p1, p2, restitution, duration) => {
+  
+  // Compute separating velocity
+  var relativeVelocity = p1.velocity;
+  if(p2) relativeVelocity = sub(relativeVelocity, p2.velocity); // vec3
+  var contactNormal = norm(sub(p1.position, p2.position)); // normalized vec3
+  var separatingVelocity = dot(relativeVelocity, contactNormal); // Number
+  
+  // Separating: nothing to do
+  if(separatingVelocity > 0){
+    return;
+  }
+  
+  // Closing: compute new separating velocity
+  var newSepVelocity = -separatingVelocity * restitution;
+  
+  // ======== added from page 128 ========
+  
+  // Check velocity caused by acceleration only
+  var accCausedVelocity = p1.acceleration; // vec3
+  if(p2) accCausedVelocity = sub(accCausedVelocity, p2.acceleration);
+  var accCausedSepVelocity = dot(accCausedVelocity, scale(contactNormal, duration));
+  
+  // Remove closing velocity due to acceeration buildup
+  if(accCausedSepVelocity < 0){
+    newSepVelocity += restitution * accCausedSepVelocity,
+    if(newSepVelocity < 0) newSepVelocity = 0;
+  }
+  
+  // =====================================
+  
+  var deltaVelocity = newSepVelocity - separatingVelocity; // Number
+  
+  // Apply changes in proportion to the inverse masses
+  var totalInverseMass = p1.inverseMass;
+  if(p2) totalInverseMass += p2.inverseMass;
+  if(totalInverseMass <= 0) return; // both are immovable
+  
+  // Compute impulse per unit of inverse mass
+  var impulse = deltaVelocity / totalInverseMass;
+  var impulsePerIMass = scale(contactNormal, impulse);
+  
+  // Apply impulse
+  p1.velocity = addScaled(p1.velocity, impulsePerIMass, p1.inverseMass);
+  if(p2){
+    p2.velocity = addScaled(p2.velocity, impulsePerIMass, -p2.inverseMass);
+  }
+}
+
+// Collision detection and resolution
+// The goal is to separate interpenetrating objects immediately,
+// By moving them along the contact normal, proportionally to their masses,
+// in parallel of updating their velocities (see code above).
+resolveInterpenetration = (p1, p2, penetration) => {
+  
+  // No penetration
+  if(penetration <= 0) return;
+  
+  // Total inverse mass
+  var totalInverseMass = p1.inverseMass;
+  if(p2) totalInverseMass += p2.inverseMass;
+  if(totalInverseMass <= 0) return; // both are immovable
+  
+  // Compute penetration per unit of inverse mass
+  var movePerIMass = scale(contactNormal, penetration / totalInverseMass); // vec3
+  
+  // Compute movement
+  var p1movement = scale(movePerIMass, p1.inverseMass);
+  p1.position = add(p1.position, p1movement);
+  var p2movement = vec3();
+  if(p2){
+    p2movement = scale(movePerIMass, -p2.inverseMass);
+    p2.position = add(p2.position, p2movement);
+  }
+}
+
+// Contact resolver function (TODO, p. 133)
+
+// Contact resolver algorithm (at each frame):
+// 1. Calculate all separating velocities, consider the lowest (negative) one.
+// 2. If all separating velocities are >= 0: exit.
+// 3. Process collision response for contact with lowest separating velocity.
+// 4. If there are more iterations, return to Step 1
+
+// Cables (links) prevent two object from getting apart further than a given 
+// distance, but they can get closer.
+// It works like the opposite of an interpenetration collisions.
+// (TODO, p. 139)
+
+// Rods are a mix of collision anc cables: objects are kept at an exact distance.
+// (TODO: p. 140)
+
 // Chapter 8. The Mass Aggregate Physics Engine (p. 145-154)
 // ----------------------------------------------------------
+
+// TODO: ParticleWorldGenerateContacts, ParticleWorldIntegrate, ParticleWorldRunPhysics, loop
 
 // ===========================================
 //  Part III: Rigid-Body Physics (p. 155-248)
 // ===========================================
+
+// Chapter 9. The Maths of Rotations (p. 157)
+// ------------------------------------------
+
+// - Rotation = orientation (in radians).
+// - Angular velocity: rate of change of orientation (in radians per second).
+
+// 2D rotations:
+// - can be expressed between 0rad (0deg) and 2*Pi rad (360deg), or in (-Pi, Pi].
+// - Wrap (Ex: 2*Pi is the same angle as 0, Pi/2 is the same angle as -3*Pi/2.)
+// - Rotation In vector form: θ^ = [ cosθ, sin θ ]
+// - Rotation matrix: r = [ cosθ, sinθ,
+//                         -sinθ, cosθ ];
+// Multiplying a vector or a point by r rotates it θ radians around the origin.
+// If rotation is not around the origin: perform rotation, then translation.
+// - Any number of translation ans rotation can be accumuled into a single 
+// translation and a single rotation.
+
+// 3D rotations representations:
+// - Euler Angles (3 degrees of freedom, but too limited for most use cases).
+// - Axis-angle: any combination of rotations can be represented by a single
+// rotation along a specific axis. Works, compact, but impractical (complex maths).
+// - Rotation Matrices: representation used bu GPUs internally. Combining two
+// rotations is simple (matrix multiplication).
+// Limitations of matrices: 9 values, floating points approximations stack up.
+
+// Quaternions:
+// - 4 degrees of freedom, precise, and convertible into a matrix.
+// - Vector form: q = [cos θ/2, x * sin θ/2, y * sin θ/2, z * sin θ/2],
+// where [x, y, z] is the axis and θ the angle.
+// - Numeric form: q = w + xi + yj + zk, where i, j, k are imaginary numbers:
+// i² = j² = k² = -1 and ijk = -1.
+// Thus (by definition): ij = -ji = k. jk = -kj = i. ki = -ik = j.
+// - Combination by multiplication: (w1 + x1i + y1j + z1k) × (w2 + x2i + y2j + z2k)
+// - Let's write quaternions as 4D vectors this way: θ = [w, x, y, z].
+// - Ensure normalized magnitude: sqrt(w² + x² + y² + z²) = 1
+// - Angular velocity quaternion: w = [0, θ˙x, θ˙y, θ˙z]. Not normalized.
 
 // ===========================================
 //  Part IV: Collision Detection (p. 251-331)
