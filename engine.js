@@ -48,7 +48,7 @@
 // - Ensure normalized magnitude: sqrt(w² + x² + y² + z²) = 1
 // - Angular velocity quaternion: w = [0, θ˙x, θ˙y, θ˙z]. Not normalized.
 
-// In JS, points, vectors ans quaternions can be represented with DOMPoint.
+// In JS, points, vectors and quaternions can be represented with DOMPoint.
 // 4x4 matrices can be represented with DOMMatrix.
 // Ex: new DOMPoint(x,y,z,1) is a point, new DOMPoint(i,j,k,1) is a quaternion,
 // and new DOMPoint(1,2,3,0) is a vector.
@@ -61,7 +61,7 @@
 // Transpose a matrix: usually not necessary because a pre-multiplication is 
 // equivalent to a transpose plus a post-multiplication. Ex: M1 * M2^T = M2 * M1.
 
-// Quaternion to matrix 4x4:
+// Quaternion to matrix 4x4 conversion:
 QtoM = (q, x = q.x, y = q.y, z = q.z, w = q.w) => new DOMMatrix([
   1 - 2 * y**2 - 2 * z ** 2,  2 * x * y + 2 * z * w,    2 * x * z - 2 * y * w,    0,
   2 * x * y - 2 * z * w,      1 - 2 * x**2 - 2 * z**2,  2 * y * z + 2 * x * w,    0,
@@ -132,18 +132,22 @@ rigidBody = (options) => {
   options.orientation ??= new DOMPoint(0,0,0,0);
   options.rotation ??= vec3(),
   options.velocity ??= vec3(),
-  acceleration = vec3(),
-  linearDamping = 1,
-  inverseMass = 1,
-  transformMatrix = new DOMMatrix() // derived data, updated once per frame
- ) => ({
-  position,
-  velocity,
-  acceleration,
-  damping,
-  inverseMass,
-  forceAccum
-});
+  acceleration ??= vec3(),
+  linearDamping ??= 1,
+  inverseMass ??= 1;
+  
+  // Create Object
+  return {
+    position,
+    orientation,
+    rotation,
+    velocity,
+    acceleration,
+    damping,
+    inverseMass,
+    transformMatrix: new DOMMatrix() // derived data, to update once per frame
+  }
+};
 
 // ===========================================
 //  Part IV: Collision Detection (p. 251-331)
