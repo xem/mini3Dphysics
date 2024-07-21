@@ -308,7 +308,7 @@ resolveVelocity = (p1, p2, restitution, duration) => {
   
   // Remove closing velocity due to acceeration buildup
   if(accCausedSepVelocity < 0){
-    newSepVelocity += restitution * accCausedSepVelocity,
+    newSepVelocity += restitution * accCausedSepVelocity;
     if(newSepVelocity < 0) newSepVelocity = 0;
   }
   

@@ -13,8 +13,9 @@
 // Chapter 9. The Maths of Rotations (p. 157)
 // ------------------------------------------
 
-// - Rotation = orientation (in radians).
-// - Angular velocity: rate of change of orientation (in radians per second).
+// Definitions:
+// - Orientation = angle (in radians).
+// - Rotation = angular velocity: rate of change of orientation (in radians/second).
 
 // 2D rotations:
 // - can be expressed between 0rad (0deg) and 2*Pi rad (360deg), or in (-Pi, Pi].
@@ -27,17 +28,17 @@
 // - Any number of translation ans rotation can be accumuled into a single 
 // translation and a single rotation.
 
-// 3D rotations representations:
+// 3D rotations "bad" representations:
 // - Euler Angles (3 degrees of freedom, but too limited for most use cases).
 // - Axis-angle: any combination of rotations can be represented by a single
 // rotation along a specific axis. Works, compact, but impractical (complex maths).
 // - Rotation Matrices: representation used bu GPUs internally. Combining two
 // rotations is simple (matrix multiplication).
-// Limitations of 3x3 matrices: 9 values to handle, floating point numbers
+// Limitations of matrices: 9 or 16 values to handle, floating point numbers
 // approximations and errors may stack up and become visible. 
 
 // Quaternions:
-// - 4 degrees of freedom, precise, and convertible into a matrix.
+// - 4 degrees of freedom, precise, and convertible into a matrix for rendering.
 // - Vector form: q = [cos θ/2, x * sin θ/2, y * sin θ/2, z * sin θ/2],
 // where [x, y, z] is the axis and θ the angle.
 // - Numeric form: q = w + xi + yj + zk, where i, j, k are imaginary numbers:
@@ -49,8 +50,9 @@
 // - Angular velocity quaternion: w = [0, θ˙x, θ˙y, θ˙z]. Not normalized.
 
 // In JS, points, vectors and quaternions can be represented with DOMPoint.
+// (WIP, NOT SURE IF I'LL KEEP DOMPOINT FOR QUATERNIONS)
 // 4x4 matrices can be represented with DOMMatrix.
-// Ex: new DOMPoint(x,y,z,1) is a point, new DOMPoint(i,j,k,1) is a quaternion,
+// Ex: new DOMPoint(x,y,z,1) is a point, new DOMPoint(i,j,k,r) is a quaternion,
 // and new DOMPoint(1,2,3,0) is a vector.
 // The 4th coordinate w is called a homogeneous coordinate and allows points and
 // vectors to be propermy multiplied with 4x4 transformation matrices.
@@ -61,22 +63,13 @@
 // Transpose a matrix: usually not necessary because a pre-multiplication is 
 // equivalent to a transpose plus a post-multiplication. Ex: M1 * M2^T = M2 * M1.
 
-// Quaternion to matrix 4x4 conversion:
-QtoM = (q, x = q.x, y = q.y, z = q.z, w = q.w) => new DOMMatrix([
-  1 - 2 * y**2 - 2 * z ** 2,  2 * x * y + 2 * z * w,    2 * x * z - 2 * y * w,    0,
-  2 * x * y - 2 * z * w,      1 - 2 * x**2 - 2 * z**2,  2 * y * z + 2 * x * w,    0,
-  2 * x * z + 2 * y * w,      2 * y * z - 2 * x * w,    1 - 2 * x**2 - 2 * y**2,  0,
-  0,                          0,                        0,                        1
-]);
-
 // A change of basis occurs if an object is moved or rotated from the origin.
 // To perform a new transformation Mt independently from a change of basis Mb:
-// M = Mb * Mt * Mb^-1  (Mb^-1 is the inverse of Mb)
+// M = Mb * Mt * Mb^-1 (Mb^-1 is the inverse of Mb)
 // From right to left: the basis change is cancelled, the transformation is done,
 // and finally the basis change is done again.
 
 // Normalize a Quaternion
-// TODO: maybe simplify with vec3's norm()
 
 normQ = q => {
   var d = 1 / Math.hypot(q.x, q.y, q.z, q.w);
@@ -112,8 +105,8 @@ addScaledQ = (q, v, scale) => {
   return new DOMPoint(q2.x / 2, q2.y / 2, q2.z / 2, q2.w / 2);
 }
 
-// Chapter 10: Laws of Motion for Rigid Bodies
-// -------------------------------------------
+// Chapter 10: Laws of Motion for Rigid Bodies (p. 207)
+// ----------------------------------------------------
 
 // RigidBody constructor
 // Options:
@@ -145,9 +138,49 @@ rigidBody = (options) => {
     acceleration,
     damping,
     inverseMass,
-    transformMatrix: new DOMMatrix() // derived data, to update once per frame
+    transformMatrix: new DOMMatrix(), // derived data, to update once per frame
+    inverseInertiaTensor: new DOMMatrix() // goven in body space
   }
 };
+
+// Normalize orientation and update transformationMatrix of a rigidBody
+
+calculateDerivedData = r => {
+  
+  // Normalize orientation
+  r.orientation = normQ(orientation);
+  
+  // Calculate inertia tensor in world space (p. 219)
+  transformInertiaTensor(
+    r, inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformMatrix
+  );
+  
+  // Calculate the body's transform matrix
+  var x = r.x, y = r.y, z = r.z, w = r.w;
+  r.transformMatrix = => new DOMMatrix([
+    1-2*y**2-2*z**2,  2*x*y+2*z*w,      2*x*z-2*y*w,      r.position.x,
+    2*x*y-2*z*w,      1-2*x**2-2*z**2,  2*y*z+2*x*w,      r.position.y,
+    2*x*z+2*y*w,      2*y*z-2*x*w,      1-2*x**2-2*y**2,  r.position.z,
+    0,                0,                0,                1
+  ]);
+}
+
+// Torque (or "moments") is a twisting force.
+// In 2D: τ = pf x f (point where force is applied x force)
+// In 3D: τ = a*d (torque magnitude * normalized axis around which torque applies)
+
+// Moment of inertia is to mass what torque is to rotation:
+// It represents how difficult it is to change the rootation speed of an object.
+
+// An inertia tensor is a 2D matrix representing a moment of inertia.
+
+// In rigidBody, the inertia tensor is inverted, like mass, and given in body space.
+// So, at each frame, we compute the transform matrix, transform the inverse inertia
+// tensor into world coordinates, then perform rigidBody integration.
+
+transformInertiaTensor = (r, iitWorld, q, iitBody, rotmat) => { /* TODO p. 218 */ }
+
+
 
 // ===========================================
 //  Part IV: Collision Detection (p. 251-331)
