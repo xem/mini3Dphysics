@@ -116,6 +116,7 @@ addScaledQ = (q, v, scale) => {
 // - velocity (vec3, default: 0,0,0)
 // - acceleration (vec3 (default: 0,0,0)
 // - linearDamping (number, default: 1 (no damping))
+// - angularDamping (number, default: 1 (no damping))
 // - inverseMass (number, default: 1/1 = 1)
 
 rigidBody = (options) => {
@@ -127,6 +128,7 @@ rigidBody = (options) => {
   options.velocity ??= vec3(),
   acceleration ??= vec3(),
   linearDamping ??= 1,
+  angularDamping ??= 1,
   inverseMass ??= 1;
   
   // Create Object
@@ -139,30 +141,33 @@ rigidBody = (options) => {
     damping,
     inverseMass,
     transformMatrix: new DOMMatrix(), // derived data, to update once per frame
-    inverseInertiaTensor: new DOMMatrix() // goven in body space
+    inverseInertiaTensor: new DOMMatrix() // given in body space
+    forceAccum: vec3(), // force accumulator
+    torqueAccum: vec3(), // torque accumulator
+    isAwake: false,
   }
 };
 
 // Normalize orientation and update transformationMatrix of a rigidBody
 
-calculateDerivedData = r => {
+RBcalculateDerivedData = r => {
   
   // Normalize orientation
   r.orientation = normQ(orientation);
   
-  // Calculate inertia tensor in world space (p. 219)
-  transformInertiaTensor(
-    r, inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformMatrix
-  );
-  
   // Calculate the body's transform matrix
   var x = r.x, y = r.y, z = r.z, w = r.w;
-  r.transformMatrix = => new DOMMatrix([
+  r.transformMatrix = new DOMMatrix([
     1-2*y**2-2*z**2,  2*x*y+2*z*w,      2*x*z-2*y*w,      r.position.x,
     2*x*y-2*z*w,      1-2*x**2-2*z**2,  2*y*z+2*x*w,      r.position.y,
     2*x*z+2*y*w,      2*y*z-2*x*w,      1-2*x**2-2*y**2,  r.position.z,
     0,                0,                0,                1
   ]);
+
+  // Calculate inertia tensor in world space (p. 219)
+  RBtransformInertiaTensor(
+    r, inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformMatrix
+  );  
 }
 
 // Torque (or "moments") is a twisting force.
@@ -178,13 +183,131 @@ calculateDerivedData = r => {
 // So, at each frame, we compute the transform matrix, transform the inverse inertia
 // tensor into world coordinates, then perform rigidBody integration.
 
-transformInertiaTensor = (r, iitWorld, q, iitBody, rotmat) => { /* TODO p. 218 */ }
+RBtransformInertiaTensor = (r, iitWorld, q, iitBody, rotmat) => {
+  
+  // P. 218 shows a complex code doing Mb * Mt * Mb^-1 (basis change) all at once.
+  // TODO (maybe in a simpler way)
+  // q seems usused
+}
 
+// Add a force to a rigidBody
 
+RBaddForce = (r, f) => {
+  r.forceAccum = add(r.forceAccum, f);
+}
+
+// Add a force at a rigidBody point
+
+RBaddForceAtBodyPoint = (r, force, point) => {
+  var pt = r.transformMatrix.transformPoint(point);
+  RBaddForceAtPoint(r, force, point);
+}
+
+// Add a force at a point
+
+RBaddForceAtPoint = (r, force, point) => {
+  var pt = sub(point, r.position);
+  r.forceAccum = add(r.forceAccum, force);
+  r.torqueAccum = add(r.torqueAccum, cross(pt, force));
+  r.isAwake = true;
+}
+
+// Force generators (TODO, p. 224)
+
+// Integrate a rigidBody
+
+inverseInertiaTensorWorld = new DOMMatrix();
+
+RBintegrate = (r, duration) => {
+  
+  // Calculate linear acceleration from force inputs.
+  var lastAcceleration = acceleration;
+  lastAcceleration = addScaledVector(lastAcceleration, forceAccum, inverseMass);
+  
+  // Calculate angular acceleration from torque inputs.
+  var angularAcceleration = inverseInertiaTensorWorld.transformPoint(r.torqueAccum);
+  
+  // Adjust velocities
+  
+  // Update linear velocity from both acceleration and impulse
+  r.velocity = addScaled(r.velocity, lastAcceleration, duration);
+  
+  // Update angular velocity from both acceleration and impulse
+  r.rotation = addScaled(r.rotation, angularAcceleration, duration);
+  
+  // Impose drag
+  r.velocity = scale(r.velocity, r.linearDamping ** duration;
+  r.rotation = scale(r.rotation, r.angularDamping ** duration;
+  
+  // Adjust positions
+  
+  // Update linear position
+  r.position = addScaled(r.position, r.velocity, duration);
+  
+  // Update angular position
+  r.orientation = addScaled(r.orientation, r.rotation, duration);
+  
+  // Normalize orientation, update matrices with new position and orientation.
+  RBcalculateDerivedData(r);
+  
+  // Clear accumulators
+  r.forceAccum = vec3();
+  r.torqueAccum = new DOMMatrix();
+}
+
+// Chapter 11. The Rigid-Body Physics Engine (p. 231)
+// --------------------------------------------------
+
+// It contains:
+// - The list of rigid bodies and their properties (position, angle, velocities...)
+// - The force generators (can include gravity)
+
+// World
+
+world = {
+  rigidBodies: [];
+  
+  // Beginning of each frame
+  startFrame: () => {
+    
+    // For each rigid body
+    for(var r of world.rigidBodies){
+      
+      // Clear accumulators
+      r.forceAccum = vec3();
+      r.torqueAccum = new DOMMatrix();
+    
+      // Calculate derived data
+      RBcalculateDerivedData(r);
+    }
+  },
+  
+  // Integrate
+  integrate: duration => {
+    for(var r of world.rigidBodies){
+      r.integrate(duration);
+    }
+  },
+  
+  // Process all physics
+  runPhysics: duration => {
+    
+    // Update forces 
+    // registry.updateForces(duration);
+    
+    // Integrate objects
+    world.integrate(duration);
+  }    
+}
+
+// TODO: plane, boat demos
 
 // ===========================================
 //  Part IV: Collision Detection (p. 251-331)
 // ===========================================
+
+// Chapter 12: Collision Detection (p.253)
+// ---------------------------------------
 
 // ======================================
 //  Part V: Contact Physics (p. 333-461)

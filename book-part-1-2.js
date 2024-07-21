@@ -132,6 +132,7 @@ gravity = vec3(0, -2, 0);
 
 // Integration (update forces and position at each frame)
 // duration: time elapsed since last frame (in ms)
+
 integrate = (p, duration) => {
   
   if(p.inverseMass != 0){
@@ -179,6 +180,8 @@ clearForceAccumulator = p => p.forceAccum = vec3();
 // Other forces include: drag, buoyancy, blast, thrust, spring
 
 addForce = (p, force) => p.forceAccum = add(p.forceAccum, force);
+
+// todo: updateForces
 
 
 // Chapter 6. Springs and Spring-Like Things (p. 89-110)
@@ -283,6 +286,7 @@ particleBuoyancy = (p, maxDepth, volume, waterHeight, liquidDensity = 1) => {
 
 // Collision processing
 // restitution is the coefficient at which the objects react to the collision.
+
 resolveVelocity = (p1, p2, restitution, duration) => {
   
   // Compute separating velocity
@@ -336,6 +340,7 @@ resolveVelocity = (p1, p2, restitution, duration) => {
 // The goal is to separate interpenetrating objects immediately,
 // By moving them along the contact normal, proportionally to their masses,
 // in parallel of updating their velocities (see code above).
+
 resolveInterpenetration = (p1, p2, penetration) => {
   
   // No penetration
