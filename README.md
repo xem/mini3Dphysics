@@ -7,11 +7,16 @@ Javacript implementation, aiming for shortness (#js13kgames)
 ## Features
 
 - Particle physics
-- WIP
+- vectors
+- matrices
+- quaternions
+- rigidBodies
+- ... (WIP)
 
-## Source code
+## Book summary + implementation
 
-- [engine.js](engine.js)
+- [Parts 1-2: vectors and particle physics](book-part-1-2.js)
+- [Part 3: quaternions and rigidBody](engine.js)
 
 ## Demos
 
