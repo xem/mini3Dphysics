@@ -309,6 +309,226 @@ world = {
 // Chapter 12: Collision Detection (p.253)
 // ---------------------------------------
 
+// Entire books are dedicated to this topic
+// (van den Bergen [2003], Ericson [2005], Eberly [2010])
+// Optimized collision detection consists of:
+
+// 1) Broad phase detection: reduce list of possible collisions to the minimum: 
+// - Bounding spheres (in priority), sometimes bounding boxes (tall/long objects)
+// - Bounding objects hierarchies
+// - Space partitioning (quad-tree, oct-tree...)
+
+// 2) Narrow-phase detection (final test saying if a pair of objects do collide)
+
+// TODO: implement some of these algorithms if needed.
+
+// Chapter 13: Generating Contacts (p. 291)
+// ----------------------------------------
+
+// Even at narrow-phase, fine collisions can be done with approaching primitives.
+// We will also consider collisions with planes (often used in level geometry).
+// An assembly of primitive shapes can be used to approach a shape's object.
+// - Collision detection determines interpenetration (point + depth of collision).
+// - Contact generation determines contact data including: point or area of contact
+// on each object, direction and extent of deepest interpenetration, collision 
+// normal, collision restitution (bounciness), friction...
+// GJK algorithm: general-purpose (but incomplete data)
+// SAT algorithm: more complete (but produces at most 1 contact per pair of objects)
+// Contact coherence technique: used to complete such algorithms.
+
+// Detection priority (p. 296)
+// 1. Vertex–face and edge–edge (nonparallel edges)
+// 2. Edge–face and face–face
+// 3. Vertex–edge, vertex–vertex, and edge–edge (parallel edges) - generally ignored
+
+// the most important ones:
+// Vertex-face (p. 300)
+// Edge-edge (p. 301)
+// Edge-face (p. 301)
+
+// Contact
+
+contact = options => {
+  options.contactNormal ??= vec3();
+  options.contactPoint ??= vec3();
+  options.penetration ??= 0;
+  options.data ??= {}; // bodies, friction, restitution
+  return options;
+}
+
+// Sphere
+
+sphere = options => {
+  options.position ??= vec3();
+  options.radius ??= 1;
+  return options;
+}
+
+// Sphere vs sphere
+
+collisionDetectorSphereSphere = (one, two, data) => {
+  var positionOne = one.position;
+  var positionTwo = two.position;
+  var midLine = sub(positionOne, positionTwo);
+  var size = len(midline);
+  if(size <= 0 || size > one.radius + two.radius){ return 0 }
+  var normal = scale(midline, 1/size);
+  var c = contact({
+    contactNormal: normal,
+    contactPoint: add(positionOne, scale(midline, 1/2)),
+    penetration: (one.radius + two.radius - size),
+    data
+  });
+  return 1;
+}
+
+// Plane
+
+plane = options => {
+  options.direction ??= vec3(); // normal
+  options.offset ??= 0; // distance to origin
+  options.transform ??= new DOMMatrix();
+  return options;
+}
+
+// Sphere vs plane (half-space)
+
+collisionDetectorSphereHalfSpace = (sphere, plane, data) => {
+  var position = shere.position;
+  var ballDistance = dot(plane.direction, position) - sphere.radius - plane.offset;
+  if(ballDistance >= 0) return 0;
+  var c = contact({
+    contactNormal: plane.direction,
+    contactPoint: dot(sub(position, plane.direction), ballDistance + sphere.radius),
+    penetration: -ballDistance,
+    data
+  });
+  return 1;
+}
+
+// Collision with true plane is rarely useful (p. 309)
+
+// Collisions between a box and a half space produce 2 to 4 contact points.
+
+// Box
+
+box = options => {
+  options.position ??= vec3();
+  options.halfSize ??= vec3(1, 1, 1); // schema p. 313.
+  options.transform ??= new DOMMatrix();
+  return options;
+};
+
+// Distance between a point (vertex) and a plane (p. 312)
+
+// Vertices positions (p. 313)
+
+// Box vs plane (half-space)
+
+/* =================== todo: replace with axis later ====================== 
+collisionDetectorBoxHalfSpace = (box, plane, data) => {
+  
+  // Go through each combination of + and - for each half-size.
+  var mults = [
+    [1,1,1],[-1,1,1],[1,-1,1],[-1,-1,1],
+    [1,1,-1],[-1,1,-1],[1,-1,-1],[-1,-1,-1]
+  ];
+  var contactsUsed = 0;
+  var vertexPos, vertexDistance, c;
+  for(var i = 0; i < 8; i++){
+    
+    // Calculate the position of each vertex
+    vertexPos = vec3(
+      box.position.x * mults[i][0],
+      box.position.y * mults[i][1],
+      box.position.z * mults[i][2]
+    );
+    
+    vertexPos = mul(vertexPos, box.halfSize);
+    vertexPos = box.transform.transformPoint(vertexPos);
+    
+    // Calculate the distance from the plane
+    vertexDistance = dot(vertexPos, plane.direction);
+  
+    // Compare this to the plane’s distance
+    if vertexDistance <= plane.offset){
+  
+      // Create the contact data.
+      // contact point is halfway between vertex and plane.
+      c = etc...
+}
+============================*/
+
+// Sphere vs box (p. 316)
+
+collisionDetectorBoxSphere(box, sphere, data){
+
+  // Transform the centre of the sphere into box coordinates
+  var centre = sphere.position;
+  var relCentre = box.transform.inverse().transformPoint(centre);
+
+  // Early out check to see if we can exclude the contact
+  if(
+    Math.abs(relCentre.x) - sphere.radius > box.halfSize.x ||
+    Math.abs(relCentre.y) - sphere.radius > box.halfSize.y ||
+    Math.abs(relCentre.z) - sphere.radius > box.halfSize.z)
+  ){
+    return 0;
+  }
+
+  var closestPt = vec3(0,0,0);
+  var dist;
+
+  // Clamp each coordinate to the box
+  dist = relCentre.x;
+  if(dist > box.halfSize.x) dist = box.halfSize.x;
+  if(dist < -box.halfSize.x) dist = -box.halfSize.x;
+  closestPt.x = dist;
+
+  dist = relCentre.y;
+  if(dist > box.halfSize.y) dist = box.halfSize.y;
+  if(dist < -box.halfSize.y) dist = -box.halfSize.y;
+  closestPt.y = dist;
+
+  dist = relCentre.z;
+  if(dist > box.halfSize.z) dist = box.halfSize.z;
+  if(dist < -box.halfSize.z) dist = -box.halfSize.z;
+  closestPt.z = dist;
+
+  // Check we're in contact
+  dist = squareMagnitude(sub(closestPt, relCentre));
+  
+  if(dist > sphere.radius * sphere.radius) return 0;
+
+  // Compile the contact
+  var losestPtWorld = box.transform.transformPoint(closestPt);
+
+  var c = contact({
+    contactNormal: norm(sub(closestPtWorld, centre)),
+    contactPoint: closestPtWorld,
+    penetration: sphere.radius - Math.sqrt(dist),
+    data
+  });
+
+  return 1;
+}
+
+
+
+
 // ======================================
 //  Part V: Contact Physics (p. 333-461)
 // ======================================
+
+
+
+
+
+
+
+
+
+
+// TODO: all .transformPoint() must be done on a DOMPoint.
+
+

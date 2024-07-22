@@ -39,6 +39,9 @@ vec3 = (x = 0, y = 0, z = 0) => ({x, y, z});
 
 len = v => Math.hypot(v.x, v.y, v.z);
 
+// Square magnitude
+squareMagnitude = v => v.x ** 2 + v.y ** 2 + v.z **2;
+
 // Scale (set length without changing the direction, operator: *)
 
 scale = (v, s) => ({ x: v.x * s, y: v.y * s, z: v.z * s });
