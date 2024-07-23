@@ -6,7 +6,7 @@ Summary and minimalist JavaScript implementation of the book "Game Physics Cookb
 
 # Source code
 
-See the [https://github.com/xem/mini3Dphysics/tree/gh-pages/old](lib) folder
+See the lib folder
 
 # Demos by chapter
 
