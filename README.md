@@ -1,31 +1,46 @@
-﻿# MINI 3D PHYSICS
+# Mini3DPhysics
 
-Based on the book "Game Physics Engine Development (2nd Edition)" by Ian Millington.
+Summary and minimalist JavaScript implementation of the book "Game Physics Cookbook" by Gabor Szauer
 
-Javacript implementation, aiming for shortness (#js13kgames)
-
-## Features
-
-- Particle physics
-- vectors
-- matrices
-- quaternions
-- rigidBodies
-- ... (WIP)
-
-## Book summary + implementation
-
-- [Parts 1-2: vectors and particle physics](book-part-1-2.js)
-- [Part 3: quaternions and rigidBody](engine.js)
-
-## Demos
+(WIP)
 
 
-### Chapter 4
 
-- [projectiles](https://xem.github.io/mini3Dphysics/demos/4-projectiles/index.html)
-- [fireworks](https://xem.github.io/mini3Dphysics/demos/4-fireworks/index.html)
+# Source code
 
-### Chapter 6
+[lib](See lib folder)
 
-- [buoyancy](https://xem.github.io/mini3Dphysics/demos/6-buoyancy/index.html)
+# Chapters
+
+
+[1. Vectors](https://xem.github.io/mini3Dphysics/1/)
+
+2. Matrices
+
+3. Matrix Transformations
+
+4. 2D Primitive Shapes
+
+5. 2D Collisions
+
+6. 2D Optimizations
+
+7. 3D Primitive Shapes
+
+8. 3D Point Tests
+
+9. 3D Shape Intersections
+
+10. 3D Line Intersections
+
+11. Triangles and Meshes
+
+12. Models and Scenes
+
+13. Camera and Frustum
+
+14. Constraint Solving
+
+15. Manifolds and Impulses
+
+16. Springs and Joints
