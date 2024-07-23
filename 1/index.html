@@ -1,0 +1,92 @@
+﻿<h1>Chapter 1: Vectors</h1>
+→ Source code: <a href="../lib/vec.js">vec.js</a>.
+<br>
+<h2>Definition</h2>
+<p>A vector is a tuple (1D array) containing up to 4 components (numbers), corresponding to the axis x, y, z, w.
+<p>This JS library will represent vectors with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMPoint">DOMPoint</a>.
+<p><code>v = new DOMPoint(x, y, z, w)</code>
+<p>A vector either represents a signed displacement (direction and magnitude, when w = 0) or a point in space (when w = 1).
+<p>w is called a homogeneous coordinate, making sense when the vector is transformed (see chapter 3).
+
+<p><img src="dir.png" width=300>
+
+<h2>Component-wise operations</h2>
+<p><code>// Addition
+add = (u, v) => new DOMPoint(u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w);
+
+// Subtraction
+sub = (u, v) => new DOMPoint(u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w);
+
+// Multiplication
+sub = (u, v) => new DOMPoint(u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w);
+
+// Scaling (s is a number)
+sub = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
+</code>
+
+<h2>Dot product</h2>
+<p>Dot product (or scalar product or inner product), returns a number representing the relative angle θ between two vectors.
+<p><code class=f>u . v = ||u|| ||v|| cos(θ)</code>
+<p>If it's positive, the vectors point to the same direction. If it's negative, they have opposite directions. If it's 0, they're perpendicular.
+
+<p><code>dot = (u, v) => u.x * v.x + u.y * v.y + u.z * v.z + u.w * v.w;</code>
+<h2>Magnitude</h2>
+<p>Magnitude represents the length of a vector. It can measure the distance between two points.
+<p> Magnitude squared is also often used in caculations.
+<p><code class=f>||v|| = √<b class=sqrt> v . v </b>
+||v||² = v . v</code>
+
+<p><code>mag = v => Math.sqrt(dot(v, v);
+mags = v => dot(v, v);</code>
+
+<h2>Normalizing</h2>
+<p>A normal vector (or unit vector) has a magnitude of 1 (or "unit length").
+<p><code class=f>v̂ = v / ||v||</code>
+<p><code>norm = mul(v, 1/mag(v);</code>
+<h2>Cross product</h2>
+<p>A cross product (×) produces a vector perpendicular to a pair of vectors.
+<p>Your right hand's thumb represents the cross-product of the two following fingers, by convention.
+
+<p><img src="cross.jpg" width=300>
+
+<p><code>cross = (u, v) => new DOMPoint(
+  u.y * v.z - u.z * v.y,
+  u.x * v.z - u.z * v.x,
+  u.x * v.y - u.y * v.x,
+  0
+);</code>
+
+<h2>Angles</h2>
+<p><code class=f>θ = cos<sup>-1</sup>(u.v / ||u|| ||v||)</code>
+<p><code>angle = (u, v) => Math.acos(dot(u, v) / (norm(u) * norm(v)))</code>
+
+<h2>Projection</h2>
+<p>Projecting a vector u on a vector v gives the parallel component of u (the length of u in the direction of v).
+
+<p><code>proj = (u, v) => mul(dot(u, v) / mags(v)) * v;</code>
+
+<p>The perpendicular component can be deduced from it.
+
+<p><code>perp = (u, v) => sub(u, proj(u, v);</code>
+
+<p><img src="proj.png" width=300>
+
+<h2>Reflection</h2>
+
+<p>Reflection is the result of and bouncing a vector off of a plane, like a light ray on a mirror. 
+<p>The plane is defined by a normal vector n perpendicular to it.
+
+<p><img src="reflect.png" width=300>
+
+<p><code>reflect = (v, n) => sub(v, scale(proj(v,n), 2);</code>
+
+<style>
+body { font: 15px calibri }
+h2 { margin: 30px 0 0 0; }
+code { display: inline-block; background: #def; padding: 10px; margin: 10px 0; font: bold 14px/22px courier; white-space: pre; position: relative;}
+.f { background: #fde; font-family: arial; }
+code:before { content: "JS code"; color: #abc; position: absolute; top: -17px; left: 0px; font-size: 10px; }
+code.f:before { content: "Formula"; color: #cab; }
+p { padding: 0 0 0 10px }
+code b.sqrt { border-top: 1px solid; }
+</style>

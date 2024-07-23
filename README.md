@@ -4,17 +4,15 @@ Summary and minimalist JavaScript implementation of the book "Game Physics Cookb
 
 (WIP)
 
-
-
 # Source code
 
-[lib](See lib folder)
+[https://github.com/xem/mini3Dphysics/tree/gh-pages/old](See lib folder)
 
-# Chapters
-
+# Demos by chapter
 
 [1. Vectors](https://xem.github.io/mini3Dphysics/1/)
 
+/*
 2. Matrices
 
 3. Matrix Transformations
@@ -44,3 +42,5 @@ Summary and minimalist JavaScript implementation of the book "Game Physics Cookb
 15. Manifolds and Impulses
 
 16. Springs and Joints
+
+*/

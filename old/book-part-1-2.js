@@ -14,7 +14,7 @@
 // - A "scalar" means that the value in question is a number.
 
 //       /|                         Y
-//      / |                         |   .(2,2,1)
+//      / |                         |   . (2,2,1)
 //     /  |     b = a sinθ          | 
 //  a /   | b   c = a cosθ        o |_ _ _ X
 //   /    |     b = c tanθ         /
@@ -93,7 +93,7 @@ dot = (v, w) => v.x * w.x + v.y * w.y + v.z * w.z;
 cross = (v, w) => ({ 
   x: v.y * w.z - v.z * w.y,
   y: v.z * w.x - v.x * w.z,
-  z: v.x * w/y - v.y * w.x
+  z: v.x * w.y - v.y * w.x
 }); 
 
 
