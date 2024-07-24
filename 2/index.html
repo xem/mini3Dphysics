@@ -1,5 +1,5 @@
 ﻿<title>Ch.2 & 3: Matrices and matrix transformations</title>
-<h1>Chapter 2: Matrices and matrix transformations</h1>
+<h1>Chapter 2: Matrices</h1>
 → Source code: <a href="../lib/matrix.js">matrix.js</a>.
 
 <br>
@@ -40,6 +40,8 @@ M = D E F            M<sup>T</sup> = B E H
 <p>Not every matrix has an inverse.
 <p><code>mi = m.inverse();</code>
 
+<h1>Chapter 3: matrix transformations</h1>
+
 <h2>Matrix majors</h2>
 <p>Row major or column major consists in choosing conceptually how the rotation and translation are stored in a 4x4 matrix, horizontally or vertically.
 <p>The book chooses row major, but most WebGL uses column major, so we will use the latter from now on.
@@ -66,6 +68,8 @@ s = m.scale(x, y, z, ox, oy, oz); // scale around the point o</code>
 <h2>Rotation matrices</h2>
 <p>A 3x3 matrix (or submatrix) represents rotations, encoded in the following way:
 <p><img src=angles.png width=600>
+
+<p><b>Warning:</b> in DOMMatrix methods, angles are given in degrees, not radians.
 
 <h2>Axis-angle rotation</h2>
 <p>Instead of describing a rotation around X, Y and Z axis, it is defined as an unique rotation around a custom, oriented axis.

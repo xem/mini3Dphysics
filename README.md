@@ -20,18 +20,14 @@ See the lib folder
 
 6. 2D Optimizations (skipped)
 
-[7. 3D Primitive Shapes](https://xem.github.io/mini3Dphysics/7/)
+[7. 3D Primitive Shapes + ](https://xem.github.io/mini3Dphysics/7/)
+
+8. 3D Point Tests (skipped)
+
+9. 3D Shape Intersections
 <!--
 
 
-
-
-
-
-
-8. 3D Point Tests
-
-9. 3D Shape Intersections
 
 10. 3D Line Intersections
 
