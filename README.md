@@ -22,7 +22,7 @@ See the lib folder
 
 [7. 3D Primitive Shapes](https://xem.github.io/mini3Dphysics/7/)
 
-8. 3D Point Tests (skipped)
+[8. 3D Point Tests](https://xem.github.io/mini3Dphysics/8/)
 
 [9. 3D Shape Intersections](https://xem.github.io/mini3Dphysics/9/)
 <!--

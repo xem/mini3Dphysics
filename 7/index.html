@@ -4,7 +4,7 @@
 
 <br>
 
-<p>(Skipped sections: Point, line segment, ray, axis-aligned bounding box (AABB), triangle)
+<p>(Skipped: Point, line segment, ray, axis-aligned bounding box (AABB), triangle)
 
 <!--
 <h2>Point</h2>
@@ -76,11 +76,12 @@ a = aabb({position: new DOMPoint(1,2,3), size: new DOMPoint(4,5,6)});</code>
 -->
 
 <h2>Oriented bounding box</h2>
-<p>An OBB is defined by a position, a size ans matrix transformation.
+<p>An OBB is defined by a position, a size in each direction (array of 3 numbers) and a matrix transformation.
+<p>Its non-oriented equivalent is the AABB (axis-aligned bounding box).
 <p><code>// Constructor
 obb = options => {
   options.position ??= new DOMPoint();
-  options.size ??= new DOMPoint();
+  options.size ??= [1, 1, 1];
   options.orientation ??= new DOMMatrix();
   return options;
 }

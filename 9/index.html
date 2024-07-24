@@ -2,6 +2,30 @@
 <h1>Chapter 9: 3D shape intersection</h1>
 → Source code: <a href="../lib/collision.js">collision.js</a>.
 
+<h2>Sphere to sphere</h2>
+<p>Two spheres intersect if their distance is lower than the sum of their radii.
+
+<p><code>collisionSphereSphere = (s1, s2) => {
+  var sqdist = mag(sub(s1.position, s2.position)) &lt; (s1.radius + s2.radius);
+}</code>
+
+<h2>Sphere to OBB</h2>
+
+<p>A sphere intersects with an OBB if its distance to the closest point of the OBB is smaller than its radius.
+
+<p><code>collisionSphereOBB = (sphere, obb) => {
+  var closest = closestPointOBB(obb, sphere.position);
+  var dist = mag(sub(sphere.position, closest);
+  return dist &lt; sphere.radius;
+}</code>
+
+
+<h2>Sphere to plane</h2>
+<h2>OBB to OBB</h2>
+<h2>OBB to plane</h2>
+<h2>plane to plane</h2>
+
+
 <style>
 body { font: 15px calibri }
 h2 { margin: 30px 0 0 0; }
