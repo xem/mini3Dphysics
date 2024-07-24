@@ -3,12 +3,16 @@
 <br>
 <h2>Definition</h2>
 <p>A vector is a tuple (1D array) containing up to 4 components (numbers), corresponding to the axis x, y, z, w.
-<p>This JS library will represent vectors with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMPoint">DOMPoint</a>.
-<p><code>v = new DOMPoint(x, y, z, w)</code>
-<p>A vector either represents a signed displacement (direction and magnitude, when w = 0) or a point in space (when w = 1).
-<p>w is not a 4th spatial dimension but a homogeneous coordinate, useful when the vector gets transformed (see chapter 3).
-
+<p>It either represents a signed displacement (direction and magnitude) or a point in space.
+<p>Examples of 2D vectors:
 <p><img src="dir.png" width=300>
+
+<p>This JS library will represent vectors with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMPoint">DOMPoint</a>.
+<p><code>v = new DOMPoint(x, y) // 2D
+v = new DOMPoint(x, y, z) // 3D
+v = new DOMPoint(x, y, z, w) // 3D + w component</code>
+<p>w is not a 4th spatial dimension but a homogeneous coordinate, useful when the vector gets transformed.
+<p>When a vector is a point: w = 1. When it's a direction: w = 0. More info in chapter 3.
 
 <h2>Component-wise operations</h2>
 <p><code>// Addition
@@ -47,7 +51,7 @@ mags = v => dot(v, v);</code>
 <p>A cross product (×) produces a vector perpendicular to a pair of vectors.
 <p>Your right hand's thumb represents the cross-product of the two following fingers, by convention.
 
-<p><img src="cross.jpg" width=300>
+<p><img src="cross.png" width=300>
 
 <p><code>cross = (u, v) => new DOMPoint(
   u.y * v.z - u.z * v.y,
@@ -61,7 +65,7 @@ mags = v => dot(v, v);</code>
 <p><code>angle = (u, v) => Math.acos(dot(u, v) / (norm(u) * norm(v)))</code>
 
 <h2>Projection</h2>
-<p>Projecting a vector u on a vector v gives the parallel component of u (the length of u in the direction of v).
+<p>proj<sub>v</sub>u gives the parallel component of u (the length of u in the direction of v).
 
 <p><code>proj = (u, v) => mul(dot(u, v) / mags(v)) * v;</code>
 
@@ -78,7 +82,7 @@ mags = v => dot(v, v);</code>
 
 <p><img src="reflect.png" width=300>
 
-<p><code>reflect = (v, n) => sub(v, scale(proj(v,n), 2);</code>
+<p><code>reflect = (v, n) => sub(v, scale(proj(v,n), 2));</code>
 
 <style>
 body { font: 15px calibri }
