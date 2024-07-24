@@ -1,4 +1,5 @@
-﻿<h1>Chapter 1: Vectors</h1>
+﻿<title>Ch.1: Vectors</title>
+<h1>Chapter 1: Vectors</h1>
 → Source code: <a href="../lib/vec.js">vec.js</a>.
 <br>
 <h2>Definition</h2>
@@ -6,13 +7,15 @@
 <p>It either represents a signed displacement (direction and magnitude) or a point in space.
 <p>Examples of 2D vectors:
 <p><img src="dir.png" width=300>
+<p>Remember that displacement vectors don't have a position. They only define a position offset that can start from anywhere.
 
-<p>This JS library will represent vectors with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMPoint">DOMPoint</a>.
-<p><code>v = new DOMPoint(x, y) // 2D
-v = new DOMPoint(x, y, z) // 3D
-v = new DOMPoint(x, y, z, w) // 3D + w component</code>
+<p>Our JS library will represent all vectors with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMPoint">DOMPoint</a>.
+<p><code>v1 = new DOMPoint();            // default values: 0, 0, 0, 1
+v2 = new DOMPoint(x, y);        // 2D
+v3 = new DOMPoint(x, y, z);     // 3D
+v4 = new DOMPoint(x, y, z, w);  // 3D + w component</code>
 <p>w is not a 4th spatial dimension but a homogeneous coordinate, useful when the vector gets transformed.
-<p>When a vector is a point: w = 1. When it's a direction: w = 0. More info in chapter 3.
+<p>When a vector is a point: w = 1. When it's a direction: w = 0. More info in chapter 3 (vector-matrix multiplication).
 
 <h2>Component-wise operations</h2>
 <p><code>// Addition
@@ -49,7 +52,7 @@ mags = v => dot(v, v);</code>
 <p><code>norm = mul(v, 1/mag(v);</code>
 <h2>Cross product</h2>
 <p>A cross product (×) produces a vector perpendicular to a pair of vectors.
-<p>Your right hand's thumb represents the cross-product of the two following fingers, by convention.
+<p>Your right hand's thumb represents the cross-product of the two following fingers, it is the default convention in WebGL. In a left-hand system, it would point to the opposite direction. 
 
 <p><img src="cross.png" width=300>
 

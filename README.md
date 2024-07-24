@@ -12,18 +12,22 @@ See the lib folder
 
 [1. Vectors](https://xem.github.io/mini3Dphysics/1/)
 
+[2. Matrices + 3. Matrix Transformations](https://xem.github.io/mini3Dphysics/2/)
+
+4. 2D Primitive Shapes (skipped)
+
+5. 2D Collisions (skipped)
+
+6. 2D Optimizations (skipped)
+
+[7. 3D Primitive Shapes](https://xem.github.io/mini3Dphysics/7/)
 <!--
-2. Matrices
 
-3. Matrix Transformations
 
-4. 2D Primitive Shapes
 
-5. 2D Collisions
 
-6. 2D Optimizations
 
-7. 3D Primitive Shapes
+
 
 8. 3D Point Tests
 

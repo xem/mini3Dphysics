@@ -1,0 +1,103 @@
+﻿<title>Ch.2 & 3: Matrices and matrix transformations</title>
+<h1>Chapter 2: Matrices and matrix transformations</h1>
+→ Source code: <a href="../lib/matrix.js">matrix.js</a>.
+
+<br>
+<h2>Definition</h2>
+<p>A matrix is a 2D grid of numbers (2x2 to 4x4).
+<p>They can be combined or applied to vectors using multiplication.
+<p>Our library will represent matrices with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMMatrix/DOMMatrix">DOMMatrix</a>.
+<p><code>m = new DOMMatrix([
+  m11, m12, m13, m14,
+  m21, m22, m23, m24,
+  m31, m32, m33, m34,
+  m41, m42, m43, m44
+]);</code>
+
+<h2>Transpose</h2>
+<p>Transposing a matrix inverts its horizontal and vertical axis.
+                      
+<p><code class=f>      [A B C                   [A D G
+M = D E F            M<sup>T</sup> = B E H
+       G H I]                     C F I]</code>
+<p>It's not present in DOMMatrix, and usually doesn't need to be implemented.
+
+<h2>Multiplication</h2>
+<p>Matrices multiplication is not commutativ (applied from right to left).
+<p>The product of two matrices represents the product of each column of the first one with each line of the second one.
+<p><code>mn = m.multiply(n);</code>
+
+<h2>Identity matrix</h2>
+<p>The identity matrix doesn't change the element multiplied by it.
+<p><code>m = new DOMMatrix();</code>
+
+<h2>Determinant, matrix of minors, cofactor, adjugate</h2>
+<p>These operations are used to determine the inverse of a matrix and don't need to be detailed here.
+
+<h2>Matrix inverse</h2>
+<p>Multiplying a matrix m by its inverse m<sup>-1</sup> gives the identity matrix.
+<p>Not every matrix has an inverse.
+<p><code>mi = m.inverse();</code>
+
+<h2>Matrix majors</h2>
+<p>Row major or column major consists in choosing conceptually how the rotation and translation are stored in a 4x4 matrix, horizontally or vertically.
+<p>The book chooses row major, but most WebGL uses column major, so we will use the latter from now on.
+<p>The rows and column majors matrices are the transposed of each other.
+<p>A 4x4 matrix in column major contains rotation information on its top-left 3x3 submatrix, translation information on the right column and scale information on the diagonal.
+
+<h2>Translation</h2>
+<p>Translation describes how an object moves on each axis. It is stored in m14, m24 and m34.
+<p><code>t = m.translate(x, y, z);</code>
+
+<h2>Scaling</h2>
+<p>Scaling represents the object's scale on each axis. It is stored in m11, m22 and m33, but these components are shared with rotation.
+<p><code>s = m.scale(x, y, z); // scale around the origin
+s = m.scale(x, y, z, ox, oy, oz); // scale around the point o</code>
+
+<h2>How rotations work</h2>
+<p>Euler rotations consist in applying rotations sequentially:
+<p>- Pitch (rotation around the X axis)
+<p>- Yaw (rotation around the Y axis)
+<p>- Roll (rotation around the Z axis)
+<p><code>r = m.rotate(x, y, z);</code>
+<p>Gimbal lock happens when two axis get merged (ex: pitch at 90° then yaw at 90°), and can be solved by using Axis-angle or Quaternion rotations instead.
+
+<h2>Rotation matrices</h2>
+<p>A 3x3 matrix (or submatrix) represents rotations, encoded in the following way:
+<p><img src=angles.png width=600>
+
+<h2>Axis-angle rotation</h2>
+<p>Instead of describing a rotation around X, Y and Z axis, it is defined as an unique rotation around a custom, oriented axis.
+<p><code>r = m.rotateAxisAngle(x, y, z, angle);</code>
+
+<h2>Vector-matrix multiplication</h2>
+<p>Matrices are useful to apply transformation to vectors, with a multiplication.
+<p>Multiplying a 4x4 matrix with a vector highlights the importance of the w component:
+<p>- With directions, w = 0, so these vectors are immune to translations whrn multiplied with the 4th column of the matrix.
+<p>- With points, w = 1, so these vectors can be translated.
+<p><code>t = m.transformPoint(v);</code>
+
+<h2>Transform matrix</h2>
+<p>In games, matrices usually perform scale first, rotate second and translate last.
+
+<h2>View matrix</h2>
+<p>To render 3D scenes on a 2D screen, vertices (3D points) get transformed to appear correctly in the field of view.
+<p>- World transform computes the local point coordinates in world coordinates
+<p>- View transform puts it in eye space (or view space or camera space)
+<p>- Projection puts it into normalized device coordinates.
+
+<h2>Projection matrix</h2>
+<p>Projection can be in perspective or orthographic.
+<p><img src="cross.png" width=300>
+<p>fov: field of view angle (usually 60), aspect: canvas aspect ratio, width / height: canvas size, Z<sub>f</sub> / Z<sub>n</sub>: far and near clipping planes, cot = 1 / tan. 
+
+<style>
+body { font: 15px calibri }
+h2 { margin: 30px 0 0 0; }
+code { display: inline-block; background: #def; padding: 10px; margin: 10px 0; font: bold 14px/22px courier; white-space: pre; position: relative;}
+.f { background: #fde; font-family: arial; }
+code:before { content: "JS code"; color: #abc; position: absolute; top: -17px; left: 0px; font-size: 10px; }
+code.f:before { content: "Formula"; color: #cab; }
+p { padding: 0 0 0 10px }
+code b.sqrt { border-top: 1px solid; }
+</style>
