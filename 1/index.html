@@ -25,10 +25,10 @@ add = (u, v) => new DOMPoint(u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w);
 sub = (u, v) => new DOMPoint(u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w);
 
 // Multiplication
-sub = (u, v) => new DOMPoint(u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w);
+mul = (u, v) => new DOMPoint(u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w);
 
 // Scaling (s is a number)
-sub = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
+scale = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
 </code>
 
 <h2>Dot product</h2>
@@ -43,13 +43,13 @@ sub = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
 <p><code class=f>||v|| = √<b class=sqrt> v . v </b>
 ||v||² = v . v</code>
 
-<p><code>mag = v => Math.sqrt(dot(v, v);
+<p><code>mag = v => Math.sqrt(dot(v, v));
 mags = v => dot(v, v);</code>
 
 <h2>Normalizing</h2>
 <p>A normal vector (or unit vector) has a magnitude of 1 (or "unit length").
 <p><code class=f>v̂ = v / ||v||</code>
-<p><code>norm = mul(v, 1/mag(v);</code>
+<p><code>norm = v => scale(v, 1/mag(v));</code>
 <h2>Cross product</h2>
 <p>A cross product (×) produces a vector perpendicular to a pair of vectors.
 <p>Your right hand's thumb represents the cross-product of the two following fingers, it is the default convention in WebGL. In a left-hand system, it would point to the opposite direction. 
@@ -74,7 +74,7 @@ mags = v => dot(v, v);</code>
 
 <p>The perpendicular component can be deduced from it.
 
-<p><code>perp = (u, v) => sub(u, proj(u, v);</code>
+<p><code>perp = (u, v) => sub(u, proj(u, v));</code>
 
 <p><img src="proj.png" width=300>
 

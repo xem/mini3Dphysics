@@ -4,12 +4,17 @@
 
 <p>(Skipped: point and AABB, point and line, point and ray, point in shape tests)
 
+<p>The goal of this chapter is to find the closest point from a given test point, on the surface of a shape.
+
 <h2>Point and sphere</h2>
 <p>The closest point to a test point along the surface of a sphere is found by normalizing the vector between the sphere origin and the test point, multiplying it by the radius and adding it to the sphere origin.
 <p><code>closestPointSphere = (sphere, point) => {
-  var sphereToPoint = scale(norm(sub(point, sphere.position), radius);
-  return(sphereToPoint + sphere.position);
+  var sphereToPoint = scale(norm(sub(point, sphere.position)), radius);
+  return add(sphereToPoint, sphere.position);
 }</code>
+
+<p>Demo (test point is in black, closest point is in red)
+<p><iframe src=demo1.html width=640 height=480 frameborder=no></iframe>
 
 <h2>Point and OBB</h2>
 <p>The closest point to a test point at the surface of an OBB is found by projecting the test point on each axis of rotation of the OBB and building a vector using the projected distance on each axis.
