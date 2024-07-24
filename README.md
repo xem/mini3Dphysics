@@ -1,14 +1,16 @@
 # Mini3DPhysics
 
-Trim, summary and minimalist JavaScript implementation of the book "Game Physics Cookbook" by Gabor Szauer
+Tiny 3D physics engine inspired by the book "Game Physics Cookbook" by Gabor Szauer.
 
-(WIP)
+The engine computes everything but does not render the scene.
 
-# Source code
+The relevant chapters of the book are summarized in the pages below. They contain interactive demos rendered with [W.js](https://xem.github.io/W)
 
-See the lib folder
+# Engine source code
 
-# Chapters summaries
+See the [lib folder](https://github.com/xem/mini3Dphysics/tree/gh-pages/lib)
+
+# Chapters summarized
 
 [1. Vectors](https://xem.github.io/mini3Dphysics/1/)
 
