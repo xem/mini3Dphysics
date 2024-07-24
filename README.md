@@ -1,6 +1,6 @@
 # Mini3DPhysics
 
-Summary and minimalist JavaScript implementation of the book "Game Physics Cookbook" by Gabor Szauer
+Trim, summary and minimalist JavaScript implementation of the book "Game Physics Cookbook" by Gabor Szauer
 
 (WIP)
 
@@ -8,7 +8,7 @@ Summary and minimalist JavaScript implementation of the book "Game Physics Cookb
 
 See the lib folder
 
-# Demos by chapter
+# Chapters summaries
 
 [1. Vectors](https://xem.github.io/mini3Dphysics/1/)
 
@@ -20,11 +20,11 @@ See the lib folder
 
 6. 2D Optimizations (skipped)
 
-[7. 3D Primitive Shapes + ](https://xem.github.io/mini3Dphysics/7/)
+[7. 3D Primitive Shapes](https://xem.github.io/mini3Dphysics/7/)
 
 8. 3D Point Tests (skipped)
 
-9. 3D Shape Intersections
+[9. 3D Shape Intersections](https://xem.github.io/mini3Dphysics/9/)
 <!--
 
 
