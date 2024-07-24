@@ -4,7 +4,7 @@
 
 <br>
 <h2>Definition</h2>
-<p>A matrix is a 2D grid of numbers (2x2 to 4x4).
+<p>A matrix is a 2D grid of numbers (2x2 to 4x4) representing a transformation.
 <p>They can be combined or applied to vectors using multiplication.
 <p>Our library will represent matrices with <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMMatrix/DOMMatrix">DOMMatrix</a>.
 <p><code>m = new DOMMatrix([
@@ -23,7 +23,8 @@ M = D E F            M<sup>T</sup> = B E H
 <p>It's not present in DOMMatrix, and usually doesn't need to be implemented.
 
 <h2>Multiplication</h2>
-<p>Matrices multiplication is not commutativ (applied from right to left).
+<p>Matrices multiplication is not commutative (applied from right to left).
+<p>It is equal to a system of linear equations.
 <p>The product of two matrices represents the product of each column of the first one with each line of the second one.
 <p><code>mn = m.multiply(n);</code>
 
