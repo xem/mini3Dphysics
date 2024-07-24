@@ -88,8 +88,13 @@ s = m.scale(x, y, z, ox, oy, oz); // scale around the point o</code>
 
 <h2>Projection matrix</h2>
 <p>Projection can be in perspective or orthographic.
-<p><img src="cross.png" width=300>
-<p>fov: field of view angle (usually 60), aspect: canvas aspect ratio, width / height: canvas size, Z<sub>f</sub> / Z<sub>n</sub>: far and near clipping planes, cot = 1 / tan. 
+<p><img src="proj.png" width=600>
+<p>Where:
+<p>- fov: field of view angle (usually 60° or π/3 rad)
+<br>- width, height: canvas size
+<br>- aspect: canvas aspect ratio (width/height)
+<br>- Z<sub>f</sub>, Z<sub>n</sub>: far and near clipping planes
+<br>- cot = 1 / tan. 
 
 <style>
 body { font: 15px calibri }
