@@ -29,19 +29,18 @@ See the [lib folder](https://github.com/xem/mini3Dphysics/tree/gh-pages/lib)
 [8. 3D Point Tests](https://xem.github.io/mini3Dphysics/8/)
 
 [9. 3D Shape Intersections](https://xem.github.io/mini3Dphysics/9/)
-<!--
 
+10. 3D Line Intersections (skipped)
 
+11. Triangles and Meshes (skipped)
 
-10. 3D Line Intersections
+12. Models and Scenes (skipped)
 
-11. Triangles and Meshes
-
-12. Models and Scenes
-
-13. Camera and Frustum
+13. Camera and Frustum (skipped)
 
 14. Constraint Solving
+
+<!--
 
 15. Manifolds and Impulses
 
