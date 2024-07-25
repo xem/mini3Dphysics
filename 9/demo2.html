@@ -36,7 +36,6 @@ onload=onchange=oninput=()=>{
   var closest = closestPointOBB(o, point);
   W.move({n:"s3",x:closest.x-.02,y:closest.y,z:closest.z});
   var sph = sphere({position: new DOMPoint(-1.5, 0, 0), radius: 1/2});
-  //console.log(closest.x, sph.position.x, collisionSphereOBB(sph, o))
   if(collisionSphereOBB(sph, o)){
     W.move({n:"s9",b:"#FF000088"});
     W.move({n:"s1",b:"#FF000088"});
