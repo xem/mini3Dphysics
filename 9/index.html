@@ -6,7 +6,7 @@
 <p>Two spheres intersect if their distance is lower than the sum of their radii.
 
 <p><code>collisionSphereSphere = (s1, s2) => {
-  var sqdist = mag(sub(s1.position, s2.position)) &lt; (s1.radius + s2.radius);
+  return dist(s1.position, s2.position) &lt; (s1.radius + s2.radius);
 }</code>
 
 <p>Demo (the shapes turn red when a collision is detected)
@@ -19,8 +19,8 @@
 
 <p><code>collisionSphereOBB = (sphere, obb) => {
   var closest = closestPointOBB(obb, sphere.position);
-  var dist = mag(sub(sphere.position, closest));
-  return dist &lt; sphere.radius;
+  var d = dists(sphere.position, closest);
+  return d &lt; (sphere.radius ** 2);
 }</code>
 
 <p>Demo
