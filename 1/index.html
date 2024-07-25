@@ -18,17 +18,19 @@ v4 = new DOMPoint(x, y, z, w);  // 3D + w component</code>
 <p>When a vector is a point: w = 1. When it's a direction: w = 0. More info in chapter 3 (vector-matrix multiplication).
 
 <h2>Component-wise operations</h2>
+<p>The w component, is not computed, as it is not a physical dimension. Its value is copied from the first vector.
+
 <p><code>// Addition
-add = (u, v) => new DOMPoint(u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w);
+add = (u, v) => new DOMPoint(u.x + v.x, u.y + v.y, u.z + v.z, u.w);
 
 // Subtraction
-sub = (u, v) => new DOMPoint(u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w);
+sub = (u, v) => new DOMPoint(u.x - v.x, u.y - v.y, u.z - v.z, u.w);
 
 // Multiplication
-mul = (u, v) => new DOMPoint(u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w);
+mul = (u, v) => new DOMPoint(u.x * v.x, u.y * v.y, u.z * v.z, u.w);
 
 // Scaling (s is a number)
-scale = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
+scale = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w);
 </code>
 
 <h2>Dot product</h2>
@@ -36,7 +38,7 @@ scale = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
 <p><code class=f>u . v = ||u|| ||v|| cos(θ)</code>
 <p>If it's positive, the vectors point to the same direction. If it's negative, they have opposite directions. If it's 0, they're perpendicular.
 
-<p><code>dot = (u, v) => u.x * v.x + u.y * v.y + u.z * v.z + u.w * v.w;</code>
+<p><code>dot = (u, v) => u.x * v.x + u.y * v.y + u.z * v.z;</code>
 <h2>Magnitude</h2>
 <p>Magnitude represents the length of a vector. It can measure the distance between two points.
 <p>Magnitude squared is also often used in caculations.
