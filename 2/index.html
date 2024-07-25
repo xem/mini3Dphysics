@@ -79,7 +79,7 @@ s = m.scale(x, y, z, ox, oy, oz); // scale around the point o</code>
 <p>Matrices are useful to apply transformation to vectors, with a multiplication.
 <p>Multiplying a 4x4 matrix with a vector highlights the importance of the w component:
 <p>- With directions, w = 0, so these vectors are immune to translations whrn multiplied with the 4th column of the matrix.
-<p>- With points, w = 1, so these vectors can be translated.
+<p>- With points, w = 1 (or any value different than 0), so these vectors can be translated.
 <p><code>t = m.transformPoint(v);</code>
 
 <h2>Transform matrix</h2>

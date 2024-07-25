@@ -2,9 +2,10 @@
 <script src="../lib/shapes.js"></script>
 <script src="../lib/point.js"></script>
 <script src="../lib/vec.js"></script>
+<script src="../lib/collision.js"></script>
 <canvas id=d2 width=600 height=400></canvas>
 <p>
-X: <input id=x1 type=range min=-1 max=1 step=0.01 value=1>
+X: <input id=x1 type=range min=-2 max=1 step=0.01 value=1>
 Y: <input id=y1 type=range min=-1 max=1 step=0.01 value=0>
 Z: <input id=z1 type=range min=-1 max=1 step=0.01 value=0>
 <br>
@@ -19,18 +20,31 @@ RZ: <input id=rz1 type=range min=-90 max=90 step=0.01 value=0>
 W.reset(d2);
 W.camera({z:3});
 W.light({x:.5,y:-.5,z:-.5});
-W.cube({n:"s1",w:1,h:1,d:1,x:.5,y:0,z:0,size:1,s:1,b:"#88888888"});
-W.sphere({n:"s2",x:-2,y:0,z:0,size:.08,s:1,b:"#000000FF"});
+W.cube({n:"s1",w:1,h:1,d:1,x:.5,y:0,z:0,size:1,s:1,b:"#00FF0088"});
+W.sphere({n:"s9",x:-1.5,y:0,z:0,size:1,s:2,b:"#00FF0088"});
+W.sphere({n:"s2",x:-1.5,y:0,z:0,size:.08,s:1,b:"#000000FF"});
 W.sphere({n:"s3",x:.5-0.02,y:0,z:0,size:.08,s:1,b:"#FF0000FF"});
 W.clearColor("#fed");
 onload=onchange=oninput=()=>{
+  
+  
   M = (new DOMMatrix()).translate(+x1.value,+y1.value,+z1.value).rotate(+rx1.value,+ry1.value,+rz1.value).scale(+w1.value,+h1.value,+d1.value);
   Mpoint = (new DOMMatrix()).rotate(+rx1.value,+ry1.value,+rz1.value).translate(+x1.value,+y1.value,+z1.value)
   W.move({n:"s1",M:M})
-  var point = new DOMPoint(-2,0,0);
+  var point = new DOMPoint(-1.5,0,0);
   var o = obb({position: new DOMPoint(+x1.value, +y1.value, +z1.value), size: [+w1.value/2, +h1.value/2, +d1.value/2], orientation: Mpoint});
   var closest = closestPointOBB(o, point);
   W.move({n:"s3",x:closest.x-.02,y:closest.y,z:closest.z});
+  var sph = sphere({position: new DOMPoint(-1.5, 0, 0), radius: 1/2});
+  //console.log(closest.x, sph.position.x, collisionSphereOBB(sph, o))
+  if(collisionSphereOBB(sph, o)){
+    W.move({n:"s9",b:"#FF000088"});
+    W.move({n:"s1",b:"#FF000088"});
+  }
+  else{
+    W.move({n:"s9",b:"#00FF0088"});
+    W.move({n:"s1",b:"#00FF0088"});
+  } 
 };
 </script>
 <style>

@@ -39,12 +39,13 @@ scale = (u, s) => new DOMPoint(u.x * s, u.y * s, u.z * s, u.w * s);
 <p><code>dot = (u, v) => u.x * v.x + u.y * v.y + u.z * v.z + u.w * v.w;</code>
 <h2>Magnitude</h2>
 <p>Magnitude represents the length of a vector. It can measure the distance between two points.
-<p> Magnitude squared is also often used in caculations.
+<p>Magnitude squared is also often used in caculations.
 <p><code class=f>||v|| = √<b class=sqrt> v . v </b>
 ||v||² = v . v</code>
 
 <p><code>mag = v => Math.sqrt(dot(v, v));
-mags = v => dot(v, v);</code>
+mags = v => dot(v, v);
+dist = (u, v) => mag(sub(u, v));</code>
 
 <h2>Normalizing</h2>
 <p>A normal vector (or unit vector) has a magnitude of 1 (or "unit length").

@@ -1,0 +1,37 @@
+﻿<script src="../W/w.min.full.js"></script>
+<script src="../lib/shapes.js"></script>
+<script src="../lib/point.js"></script>
+<script src="../lib/vec.js"></script>
+<script src="../lib/collision.js"></script>
+<canvas id=d1 width=600 height=400></canvas>
+<p>Radius: <input id=r1 type=range value=r1 min=0.5 max=1.5 step=0.01>
+X: <input id=x1 type=range value=x1 min=-1.6 max=2 step=0.01>
+Y: <input id=y1 type=range value=y1 min=-1 max=1 step=0.01>
+Z: <input id=z1 type=range value=z1 min=-1 max=1 step=0.01>
+<script>
+W.reset(d1);
+W.camera({z:3});
+W.light({x:.5,y:-.5,z:-.5});
+W.sphere({n:"s2",x:-1.5,y:0,z:0,size:1,s:1,b:"#00FF0088"});
+W.sphere({n:"s1",x:0,y:0,z:0,size:1,s:1,b:"#00FF0088"});
+W.clearColor("#fed");
+onload=onchange=oninput=()=>{
+  W.move({n:"s1",size:+r1.value,x:+x1.value,y:+y1.value,z:+z1.value});
+  var s = sphere({position: new DOMPoint(+x1.value, +y1.value, +z1.value), radius: +r1.value/2});
+  var s2 = sphere({position: new DOMPoint(-1.5, 0, 0), radius: 1/2});
+  if(collisionSphereSphere(s, s2)){
+    W.move({n:"s1",b:"#FF000088"});
+    W.move({n:"s2",b:"#FF000088"});
+    console.log(1);
+  }
+  else{
+    W.move({n:"s1",b:"#00FF0088"});
+    W.move({n:"s2",b:"#00FF0088"});
+    console.log(2);
+  }
+}
+</script>
+<style>
+body { margin: 0 }
+input { width: 100px }
+</style>

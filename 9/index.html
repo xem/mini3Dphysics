@@ -9,16 +9,22 @@
   var sqdist = mag(sub(s1.position, s2.position)) &lt; (s1.radius + s2.radius);
 }</code>
 
+<p>Demo (the shapes turn red when a collision is detected)
+
+<p><iframe src=demo1.html width=640 height=480 frameborder=no></iframe>
+
 <h2>Sphere to OBB</h2>
 
 <p>A sphere intersects with an OBB if its distance to the closest point of the OBB is smaller than its radius.
 
 <p><code>collisionSphereOBB = (sphere, obb) => {
   var closest = closestPointOBB(obb, sphere.position);
-  var dist = mag(sub(sphere.position, closest);
+  var dist = mag(sub(sphere.position, closest));
   return dist &lt; sphere.radius;
 }</code>
 
+<p>Demo
+<p><iframe src=demo2.html width=640 height=530 frameborder=no></iframe>
 
 <h2>Sphere to plane</h2>
 <h2>OBB to OBB</h2>
