@@ -19,8 +19,8 @@
 
 <p><code>collisionSphereOBB = (sphere, obb) => {
   var closest = closestPointOBB(obb, sphere.position);
-  var d = dists(sphere.position, closest);
-  return d &lt; (sphere.radius ** 2);
+  var d = dist(sphere.position, closest);
+  return d &lt; sphere.radius;
 }</code>
 
 <p>Demo
