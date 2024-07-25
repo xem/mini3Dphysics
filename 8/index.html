@@ -35,9 +35,13 @@
     if(dist &lt; -obb.size[i]){
       dist = -obb.size[i];
     }
-    result = add(result, scale(axis, dist));
+    result = add(result, scale(axis[i], dist));
   }
+  return result
 }</code>
+
+<p>Demo (test point is in black, closest point is in red)
+<p><iframe src=demo2.html width=640 height=530 frameborder=no></iframe>
 
 <h2>Point and plane</h2>
 The closest point to a test point at the surface of a plane is found by subtracting the signed distance between the test point and the plane from the point's position.

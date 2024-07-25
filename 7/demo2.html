@@ -18,7 +18,10 @@ W.camera({z:3});
 W.light({x:-1,y:-1});
 W.cube({n:"s1",w:1,h:1,d:1,x:0,y:0,z:0,size:1,s:1,b:"#88888888"});
 W.clearColor("#fed");
-onchange=oninput=()=>W.move({n:"s1",w:+w1.value,h:+h1.value,d:+d1.value,x:+x1.value,y:+y1.value,z:+z1.value,rx:+rx1.value,ry:+ry1.value,rz:+rz1.value});
+onchange=oninput=()=>{
+  M = (new DOMMatrix()).scale(+w1.value,+h1.value,+d1.value).rotate(+rx1.value,+ry1.value,+rz1.value).translate(+x1.value,+y1.value,+z1.value);
+  W.move({n:"s1",M:M})
+};
 </script>
 <style>
 body { margin: 0 }

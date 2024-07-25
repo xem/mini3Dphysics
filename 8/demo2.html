@@ -1,24 +1,37 @@
 ﻿<script src="../W/w.min.full.js"></script>
+<script src="../lib/shapes.js"></script>
+<script src="../lib/point.js"></script>
+<script src="../lib/vec.js"></script>
 <canvas id=d2 width=600 height=400></canvas>
 <p>
-X: <input id=x1 type=range value=x1 min=-1 max=1 step=0.01 value=0>
-Y: <input id=y1 type=range value=y1 min=-1 max=1 step=0.01 value=0>
-Z: <input id=z1 type=range value=z1 min=-1 max=1 step=0.01 value=0>
+X: <input id=x1 type=range min=-1 max=1 step=0.01 value=1>
+Y: <input id=y1 type=range min=-1 max=1 step=0.01 value=0>
+Z: <input id=z1 type=range min=-1 max=1 step=0.01 value=0>
 <br>
-W: <input id=w1 type=range value=w1 min=.1 max=2 step=0.01 value=1>
-H: <input id=h1 type=range value=h1 min=.1 max=2 step=0.01 value=1>
-D: <input id=d1 type=range value=d1 min=.1 max=2 step=0.01 value=1>
+W: <input id=w1 type=range min=.1 max=2 step=0.01 value=1>
+H: <input id=h1 type=range min=.1 max=2 step=0.01 value=1>
+D: <input id=d1 type=range min=.1 max=2 step=0.01 value=1>
 <br>
-RX: <input id=rx1 type=range value=rx1 min=-90 max=90 step=0.01 value=0>
-RY: <input id=ry1 type=range value=ry1 min=-90 max=90 step=0.01 value=0>
-RZ: <input id=rz1 type=range value=rz1 min=-90 max=90 step=0.01 value=0>
+RX: <input id=rx1 type=range min=-90 max=90 step=0.01 value=0>
+RY: <input id=ry1 type=range min=-90 max=90 step=0.01 value=0>
+RZ: <input id=rz1 type=range min=-90 max=90 step=0.01 value=0>
 <script>
 W.reset(d2);
 W.camera({z:3});
-W.light({x:-1,y:-1});
-W.cube({n:"s1",w:1,h:1,d:1,x:0,y:0,z:0,size:1,s:1,b:"#88888888"});
+W.light({x:.5,y:-.5,z:-.5});
+W.cube({n:"s1",w:1,h:1,d:1,x:.5,y:0,z:0,size:1,s:1,b:"#ffffffff"});
+W.sphere({n:"s2",x:-2,y:0,z:0,size:.08,s:1,b:"#000000FF"});
+W.sphere({n:"s3",x:.5-0.02,y:0,z:0,size:.08,s:1,b:"#FF0000FF"});
 W.clearColor("#fed");
-onchange=oninput=()=>W.move({n:"s1",w:+w1.value,h:+h1.value,d:+d1.value,x:+x1.value,y:+y1.value,z:+z1.value,rx:+rx1.value,ry:+ry1.value,rz:+rz1.value});
+onload=onchange=oninput=()=>{
+  M = (new DOMMatrix()).translate(+x1.value,+y1.value,+z1.value).rotate(+rx1.value,+ry1.value,+rz1.value).scale(+w1.value,+h1.value,+d1.value);
+  Mpoint = (new DOMMatrix()).rotate(+rx1.value,+ry1.value,+rz1.value).translate(+x1.value,+y1.value,+z1.value)
+  W.move({n:"s1",M:M})
+  var point = new DOMPoint(-2,0,0);
+  var o = obb({position: new DOMPoint(+x1.value, +y1.value, +z1.value), size: [+w1.value/2, +h1.value/2, +d1.value/2], orientation: Mpoint});
+  var closest = closestPointOBB(o, point);
+  W.move({n:"s3",x:closest.x-.02,y:closest.y,z:closest.z});
+};
 </script>
 <style>
 body { margin: 0 }

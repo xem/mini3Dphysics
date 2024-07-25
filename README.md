@@ -4,7 +4,9 @@ Tiny 3D physics engine inspired by the book "Game Physics Cookbook" by Gabor Sza
 
 The engine computes everything but does not render the scene.
 
-The relevant chapters of the book are summarized in the pages below. They contain interactive demos rendered with [W.js](https://xem.github.io/W)
+The relevant chapters of the book are summarized in the pages below.
+
+The interactive demos are rendered independently with [W.js](https://xem.github.io/W)
 
 # Engine source code
 
