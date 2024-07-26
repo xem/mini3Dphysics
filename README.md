@@ -12,6 +12,15 @@ A custom WebGL renderer is included, based on [W.js](https://xem.github.io/W)
 
 See the [lib folder](https://github.com/xem/mini3Dphysics/tree/gh-pages/lib)
 
+# Physics engine API
+
+- physicsSystem.addRigidBody(body);
+- physicsSystem.addConstraint(constraint);
+- physicsSystem.update();
+- physicsSystem.render();
+- physicsSystem.clear();
+
+
 # Renderer API (todo)
 
 Scene:
@@ -33,7 +42,7 @@ options:
 - id (string)
 - p: position (DOMPoint)
 - r: rotation (DOMPoint)
-- s: size/radius ([w, h d] for boxes, number for spheres)
+- size: half-width/height/depth for boxes ([w, h d]), radius for spheres (r)
 - c: color (string, optional)
 - t: texture (image, optional)
 - M: transformation matrix (DOMMatrix)
@@ -44,36 +53,19 @@ options:
 
 # Chapters summarized
 
-[1. Vectors](https://xem.github.io/mini3Dphysics/1/)
-
-[2. Matrices + 3. Matrix Transformations](https://xem.github.io/mini3Dphysics/2/)
-
-4. 2D Primitive Shapes (skipped)
-
-5. 2D Collisions (skipped)
-
-6. 2D Optimizations (skipped)
-
-[7. 3D Primitive Shapes](https://xem.github.io/mini3Dphysics/7/)
-
-[8. 3D Point Tests](https://xem.github.io/mini3Dphysics/8/)
-
-[9. 3D Shape Intersections](https://xem.github.io/mini3Dphysics/9/)
-
-10. 3D Line Intersections (skipped)
-
-11. Triangles and Meshes (skipped)
-
-12. Models and Scenes (skipped)
-
-13. Camera and Frustum (skipped)
-
-14. Constraint Solving
-
-<!--
-
-15. Manifolds and Impulses
-
-16. Springs and Joints
-
--->
+- [1. Vectors](https://xem.github.io/mini3Dphysics/1/)
+- [2. Matrices + 3. Matrix Transformations](https://xem.github.io/mini3Dphysics/2/)
+- 4. 2D Primitive Shapes (skipped)
+- 5. 2D Collisions (skipped)
+- 6. 2D Optimizations (skipped)
+- [7. 3D Primitive Shapes](https://xem.github.io/mini3Dphysics/7/)
+- [8. 3D Point Tests](https://xem.github.io/mini3Dphysics/8/)
+- [9. 3D Shape Intersections](https://xem.github.io/mini3Dphysics/9/)
+- 10. 3D Line Intersections (skipped)
+- 11. Triangles and Meshes (skipped)
+- 12. Models and Scenes (skipped)
+- 13. Camera and Frustum (skipped)
+- [14. Constraint Solving](https://xem.github.io/mini3Dphysics/14/)
+- [15. Manifolds and Impulses](https://xem.github.io/mini3Dphysics/15/)
+- [16. Springs and Joints](https://xem.github.io/mini3Dphysics/16/)
+- [Appendix: advanced topics](https://xem.github.io/mini3Dphysics/17/)
