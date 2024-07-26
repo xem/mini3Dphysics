@@ -6,11 +6,41 @@ The engine computes everything but does not render the scene.
 
 The relevant chapters of the book are summarized in the pages below.
 
-The interactive demos are rendered independently with [W.js](https://xem.github.io/W)
+A custom WebGL renderer is included, based on [W.js](https://xem.github.io/W)
 
 # Engine source code
 
 See the [lib folder](https://github.com/xem/mini3Dphysics/tree/gh-pages/lib)
+
+# Renderer API (todo)
+
+Scene:
+- W.reset(webglContext)
+- W.light({x, y, z})
+- W.camera({x, y, z, rx, ry, rz, fov})
+- W.wclearColor("#rgb");
+
+Shapes:
+- W.sphere(options)
+- W.box(options)
+- W.add(model_name, {vertices, uv, indices}) // register new model, then it can be rendered using <b>W.model_name(options)</b>
+
+Transformations:
+- W.move(options)
+- W.delete(id)
+
+options: 
+- id (string)
+- p: position (DOMPoint)
+- r: rotation (DOMPoint)
+- s: size/radius ([w, h d] for boxes, number for spheres)
+- c: color (string, optional)
+- t: texture (image, optional)
+- M: transformation matrix (DOMMatrix)
+- s: smoothing (0/1)
+
+(contrary to W.js, this renderer does not include groups, delays, animations, planes, billboards and pyramids)
+
 
 # Chapters summarized
 

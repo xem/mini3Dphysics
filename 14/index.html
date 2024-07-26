@@ -1,23 +1,31 @@
 ﻿<title>Ch.14: Contraint Solving</title>
 <h1>Chapter 14: Contraint Solving</h1>
 <p>→ Source code: <a href="../lib/rigidbody.js">rigidbody.js</a>.
-<p>(skipped: C++ framework and raycast sections)
+<p>(skipped: C++ framework, raycasting, particles, verlet)
 
 <h2>Physics system</h2>
 
-<p>The physics system will be used to store all the objects present in the scene.
-<p>These objects are called rigidBodies (they keep their shape and mass constant during the simulation).
+<p>The physics system will store and control all the objects present in the scene.
+<p>These objects are called rigidBodies (they keep their shape, size and mass constant during the simulation).
 
-<p><code>// RigidBody (todo: use class?)
+<p><code>// RigidBody
 
-rigidBody = options => {
-  return options;
+class rigidBody {
+
+  constructor(options){
+    for(var i in options){
+      this[i] = options[i];
+    }
+  }
+
+  update(deltaTime) {}
+  
+  render() {}
+  
+  applyForces() {}
+  
+  solveConstraints(constraints) {}
 }
-
-rigidBody.update = deltaTime => {}
-rigidBody.render = () => {}
-rigidBody.applyForces = () => {}
-rigidBody.solveConstraints = constraints => {}
 
 // Physics system
 
@@ -60,39 +68,87 @@ physicsSystem = {
 
 <h2>Integrating particles</h2>
 
-<p>Integrating consists of guessing where an object will be in a given amount of time based on its current position and velocity, and the forces applied to it.
-<p>Integrating the acceleration in respect to time will yield the object's updated velocity.
-<p>Then, integrating the velocity in respect to time will yield the updated position.
+<p>Integrating consists of guessing where an object will be in a given amount of time based on its current position, velocity, and the forces applied to it.
+<p>Integrating the acceleration in respect to time will update its object's velocity.
+<p>Then, integrating the velocity in respect to time will update its position.
 <p>These are called Euler integrations and are based on Newton's Laws of Motion:
 <p>1) An object's velocity doesn't change unless it is affected by an external force.
-<p>2) An object's acceleration os proportional to the magnitude of the force acting on it, and inversely proportonal to its mass.
+<p>2) An object's acceleration is proportional to the magnitude of the force applied to it, and inversely proportonal to its mass.
 <p>3) Every action has an equal and opposite reaction.
-<p><code class=f>F = MA // Force = Mass * Acceleration</code>
+<p><code class=f>F = MA
+(Force = Mass x Acceleration)</code>
 <p>At each frame of our simulation:
-<p>- The time elapsed since last frame is measured (or hard-coded), commonly called deltaTime (Δt).
+<p>- The time elapsed since last frame is measured (or fixed), commonly called deltaTime (Δt).
 <p>- The new velocity of an object is its previous velocity plus acceleration forces applied for the duration of the elapsed time.
 <p><code class=f>V<sub>new</sub> = V + AΔt</code>
 <p>- The new position of an object is its previous position plus its velocity scaled over the elapsed time. 
 <p><code class=f>P<sub>new</sub> = P + VΔt</code>
-<p>Let's begin with particles (rigidBodies with no size), that are only affected by gravity.
 
-<p><code>gravity = new DOMPoint(0,-1,0,0);
-friction = 1;
+<!--<p>Let's begin with particles (rigidBodies with no size), that are only affected by gravity and do not rotate.
 
+<p><code>// Particle
 
-particle = options => {
-  options.position ??= new DOMPoint();
-  options.oldPosition ??= new DOMPoint();
-  options.forces ??= new DOMPoint(0,0,0,0);
-  options.velocity ??= new DOMPoint(0,0,0,0);
-  options.mass ??= 1;
-  options.bounce ??= 1;
+class particle extends rigidBody {
+
+  // Globals
+
+  gravity = new DOMPoint(0,-9.82,0,0);
+  friction = 0.95;
+
+  // Specific
+  
+  mass = 1;
+  bounce = 0.7;
+  
+  // Others
+  
+  position = new DOMPoint();
+  oldPosition = new DOMPoint();
+  forces = new DOMPoint(0,0,0,0);
+  velocity = new DOMPoint(0,0,0,0);
+  
+  constructor(options){
+    super(options);
+  }
+  
+  // Common
+  
+  update(deltaTime){
+    this.oldPosition = position;
+    var acceleration = scale(this.forces, 1/mass);
+    this.velocity = add(scale(this.velocity, friction), scale(acceleration, deltaTime));
+    this.position = add(this.position, scale(this.velocity, deltaTime);
+  }
+  
+  render(){ W.sphere({pos: this.position, size: 0.1}) }
+  
+  applyForces(){ this.forces = this.gravity }
+  
+  solveConstraints(constraints){ /* todo */ }
+  
+  // Specific
+  
+  setPosition(pos){ this.position = this.oldPosition = pos }
+  
+  getPosition(){ return this.position }
+  
+  setBounce(b){ this.bounce = b }
+  
+  getBounce(){ return this.bounce }
 }</code>
+
+<p>For a more accurate and stable simulation, we can do velocity verlet integration my integrating the object's position using the mean of the previous velocity and the new computed velocity. (skipped for now)
+
+<p><code class=f>P = ((V<sub>old</sub> + V) / 2) Δt</code>
+
+<p>Demo:
+
+<p><iframe src=demo1.html width=640 height=480 frameborder=no></iframe>
 
 <h2>Solving constraints</h2>
 
 <h2>Verlet integration</h2>
-
+-->
 <style>
 body { font: 15px calibri }
 h2 { margin: 30px 0 0 0; }

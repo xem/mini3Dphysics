@@ -1,0 +1,20 @@
+﻿<script src="../W/w.min.full.js"></script>
+<script src="../lib/point.js"></script>
+<script src="../lib/vec.js"></script>
+<script src="../lib/collision.js"></script>
+<script src="../lib/rigidBody.js"></script>
+<canvas id=d1 width=600 height=400></canvas>
+<p><button onclick=location=location>Reset</button>
+<script>
+W.reset(d1);
+W.camera({z:3});
+W.light({x:.5,y:-.5,z:-.5});
+W.clearColor("#fed");
+onload=()=>{
+  
+}
+</script>
+<style>
+body { margin: 0 }
+input { width: 100px }
+</style>
