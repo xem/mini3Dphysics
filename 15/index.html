@@ -1,6 +1,453 @@
-﻿<title>Ch.</title>
-<h1>Chapter</h1>
-<p>→ Source code: <a href="../lib/"></a>.
+﻿<title>Ch.15: Manifold and Impulses</title>
+<h1>Chapter 15: Manifold and Impulses</h1>
+<p>→ Source code: <a href="../lib/manifold.js">manifold.js</a>.
+
+<h2>Introduction</h2>
+<p>Manifolds are data structures containing informations about collisions between rigidBodies, such as:
+<br>- collision normal (telling the direction each object needs to move to resolve the collision)
+<br>- a set of contact points (they form a plane, located halfway between the collising objects)
+<br>- penetration depth
+<br>- relative velocity (optional)
+
+<h2>Manifold for spheres</h2>
+
+<p>When a sphere collides with another sphere or a box, there is only one contact point. 
+<p><img src=sphere.png width=700>
+
+<p><code>// Collision manifold
+
+collisionManifold = options => {
+  options ??= {};
+  resetCollisionManifold(options);
+  return options;
+}
+
+resetCollisionManifold = m => {
+  m.colliding = 0;
+  m.normal = new DOMPoint(0,0,1);
+  m.depth = Infinity;
+  m.contacts = [];
+}
+
+// Sphere to sphere
+
+findCollisionFeaturesSphereSphere = (a, b) => {
+  var result = collisionManifold();
+  var r = a.radius + b.radius;
+  var d = sub(b.position, a.position);
+  var m = mag(d);
+  
+  // No collision
+  if(m >= r || m == 0) {
+    return result;
+  }
+  
+  d = norm(d);
+  result.colliding = 1;
+  result.normal = d; // towards a
+  result.depth = Math.abs(m - r) / 2;
+  result.dtp = a.radius - result.depth; // distance to intersection point
+  var contact = add(a.position, scale(d, dtp));
+  result.contacts.push(contact);
+  return result;
+}
+
+// Sphere to OBB
+
+FindCollisionFeatures = (a, b) => { // a: obb, b: sphere
+  var result = collisionManifold();
+  var closestPoint = closestPointOBB(a, b.position);
+  var d = dist(closestPoint, B.position);
+  
+  // No collision
+  if(d >= B.radius || d == 0){
+    return result();
+  }
+  
+  var normal = norm(sub(b.position, closestPoint));
+  var outsidePoint = sub(b.position, scale(normal, b.radius));
+  var distance = dist(closestPoint, outsidePoint);
+  result.colliding = 1;
+  result.contacts.push(add(closestPoint, scale(sub(outsidePoint, closestPoint), 0.5);
+  result.normal = normal;
+  result.depth = distance / 2;
+  return result;
+}</code>
+
+<h2>Manifold for boxes</h2>
+
+<p><img src=box.png width=400>
+
+<p>To make things simple, to test collisions between two OBBs A and B, we will check the edges of A against the planes of B and vice versa. It is not optimal, but reliable enough.
+<p><code>// Declare lines
+line = (start, end) => ({start, end});
+
+// Declare planes
+
+plane = options => {normal, distance) => ({normal, distance});
+
+// Get the vertices of an OBB
+
+getVertices = obb => {
+  var v = [];
+  var C = obb.position;     // Center
+  var E = obb.size;         // Extents
+  var o = obb.orientation;
+  var A = [                 // OBB axis
+    new DOMPoint(o.m11, o.m12, o.m13),
+    new DOMPoint(o.m21, o.m22, o.m23),
+    new DOMPoint(o.m31, o.m32, o.m33)
+  ];
+  
+  for(var a of [-1, 1]){
+    for(var b of [-1, 1]){
+      for(var c of [-1, 1]){
+        v.push(
+          add(add(add(C, scale(A[0], a * E[0])), scale(A[1], b * E[1])), scale(A[2], c * E[2]))
+        );
+      }
+    }
+  }
+  return v;
+}
+
+// Get the edges of an OBB
+
+getEdges = obb => {
+  var result;
+  var v = getVertices(obb);
+  var index = [  // Indices of edge-vertices
+    [6,1],[6,3],[6,4],[2,7],[2,5],[2,0],
+    [0,1],[0,3],[7,1],[7,4],[4,5],[5,3]
+  ];
+  for(var j = 0; j &lt; 12; ++j){
+    result.push(line(v[index[j][0]], v[index[j][1]));
+  }
+  return result;
+}
+
+// Get the planes of the OBB
+
+getPlanes = obb => {
+  var result = [];
+  var C = obb.position; // center
+  var E = obb.size;     // extents
+  var o = obb.orientation;
+  var A = [             // axis
+    new DOMPoint(o.m11, o.m12, o.m13),
+    new DOMPoint(o.m21, o.m22, o.m23),
+    new DOMPoint(o.m31, o.m32, o.m33)
+  ];
+  for(var a of [0, 1, 2]){
+    for(var b of [-1, 1]){
+        result.push(
+          plane(scale(A[a], b), b * dot(A[a], add(C, scale(mul(A[a] * E[A]), b)))); 
+        );
+      }
+    }
+  }
+  return result();
+}
+
+// Clip to plane
+// Checks if a line intersects a plane and if it does, clip it to the plane
+
+clipToPlane = (plane, line, outPoint) => {
+  var ab = sub(line.end, line.start);
+  var nab = dot(plane.normal, ab);
+  if(nab == 0) return 0;
+  var na = dot(plane.normal, line.start);
+  var t = scale(sub(plane.distance, na), 1 / nab);
+  if(t >= 0 && t &lt;= 1){
+    if(outPoint.value != 0){
+      outpoint.value = add(line.start, scale(ab,t));
+    }
+    return 1;
+  }
+  return 0;
+}
+
+// Clip edges to OBB
+
+clipEdgesToOBB = (edges, obb) => {
+  var result = [];
+  var intersection = { value: 0 };
+  var planes = getPlanes(obb);
+  for(var i = 0; i &lt; planes.size; i++){
+    for(var j = 0; j &lt; edges.size; j++){
+      if(clipToPlane(planes[i], edges[j], intersection)){
+        if(pointInOBB(intersection, obb)){
+          result.push(intersection);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+// Penetration depth
+
+penetrationDepth = (o1, o2, axis, outShouldFlip) => {
+  var i1 = getInterval(o1, norm(axis));
+  var i2 = getInterval(o2, norm(axis));
+  if(!((i2.min &lt;= i1.max) && (i1.min &lt; i2.max))){
+    return 0;
+  }
+  var len1 = i1.max - i1.min;
+  var len2 = i2.max - i2.min;
+  var min = Math.min(i1.min, i2.min);
+  var max = Math.max(i1.max, i2.max);
+  var length = max - min;
+  if(outShouldFlip.value != 0){
+    outShouldFlip.value = (i2.min &lt; i1.min);
+  }
+  return (len1 + len2) - length;
+}
+
+// Find collision features
+
+findCollisionFeatures = (A, B) => {
+  var j;
+  var result = collisionManifold();
+  o1 = A.orientation;
+  o2 = B.orientation;
+  var test = [ // face axis
+    new DOMPoint(o1.m11, o1.m12, o1.m13),
+    new DOMPoint(o1.m21, o1.m22, o1.m23),
+    new DOMPoint(o1.m31, o1.m32, o1.m33),
+    new DOMPoint(o2.m11, o2.m12, o2.m13),
+    new DOMPoint(o2.m21, o2.m22, o2.m23),
+    new DOMPoint(o2.m31, o2.m32, o2.m33);
+  ];
+  
+  // Other axis
+  for(var i = 0; i &lt; 3; i++){
+    test[6 + i * 3] = cross(test[i], test[0]);
+    test[6 + i * 3 + 1] = cross(test[i], test[1]);
+    test[6 + i * 3 + 2] = cross(test[i], test[2]);
+  }
+  var hitNormal = 0;
+  var shouldFlip = { value: 0 };
+  var depth;
+  for(i = 0; i &lt; 15; i++){
+    if(mags(test[i]) &lt; 0.001){
+      continue;
+    }
+    depth = penetrationDepth(A, B, test[i], shouldFlip);
+    if(depth &lt;= 0){
+      return result; // no collision
+    }
+    else if(depth &lt; result.depth){
+      if(shouldFlip.value){
+        test[i] = scale(test[i], -1);
+      }
+      result.depth = depth;
+      hitNormal = test[i];
+    }
+  }
+  
+  // No collision
+  if(hitNormal == 0){
+    return result;
+  }
+  
+  // Intersection points
+  var c1 = clipEdgesToOBB(getEdges(B), A);
+  var c2 = clipEdgesToOBB(getEdges(A), B);
+  result.contacts.push([result.contacts.at(-1), c1[0], c1.at(-1));
+  result.contacts.push([result.contacts.at(-1), c2[0], c2.at(-1));
+  var i = getInterval(A, axis);
+  var distance = (i.max - i.min) / 2 - result.depth / 2;
+  var pointOnPlane = add(A.position, scale(axis, distance));
+  var contact;
+  for(i = result.contacts.length - 1; i >= 0; i--){
+    contact = result.contacts[i]; 
+    result.contacts[i] = add(contact, scale(axis, dot(axis, sub(pointOnPlane, contact)))); 
+    
+    // Remove duplicates
+    for(j = result.contacts.size - 1; j > i; j--){
+      if(dist(result.contacts[j], result.contacts[i]) &lt; 0.0001){
+        result.contacts.splice(j, 1);
+        break;
+      }
+    }
+  }
+  result.colliding = 1;
+  result.normal = axis;
+  return result;
+}</code>
+
+<h2>Rigidbody modifications</h2>
+<p>(This section adds a type field to Rigidbody.)
+
+<h2>Linear Velocity</h2>
+<p>Linear velocity moves an object linearly, without rotation (ex: gravity).
+<p>RigidBodyVolumes represent spheres and boxes (particles have no volume).
+<p>It's supposed to extend rigidBody, but here it's standalone, because we only want spheres and boxes in our simulations.
+
+<p><code>// Global
+
+GRAVITY_CONST = new DOMPoint(0, -9.82, 0, 0);
+RIGIDBODY_SPHERE = 2;
+RIGIDBODY_BOX = 3;
+
+// rigidBodyVolume
+
+class rigidBodyVolume{
+  type; // 2: sphere, 3: box
+  position;
+  velocity;
+  forces; // sum of all forces
+  mass; // 0: immovable
+  cor; // coefficient of restitution (bounce)
+  friction;
+  box = obb();
+  sphere = sphere();
+  
+  // Constructor
+  
+  constructor(type = 0){
+    this.cor = 0.5;
+    this.mass = 1;
+    this.friction = 0.6;
+    this.type = type;
+  }
+  
+  // Functions
+  
+  render(){
+    if(this.type == RIGIDBODY_SPHERE){
+      render(sphere);
+    }
+    else if(type == RIGIDBODY_BOX){
+      render(box);
+    }
+  };
+  
+  update(dt){
+    var damping = 0.98;
+    var acceleration = scale(this.forces, this.invMass());
+    this.velocity = scale(add(this.velocity, scale(this.acceleration, dt)), damping);
+    this.position = add(this.position, scale(this.velocity, dt));
+    this.synchCollisionVolumes();
+  };
+  
+  applyForces(){
+    this.forces = scale(GRAVITY_CONST, this.mass);
+  };
+  
+  synchCollisionVolumes(){
+    this.sphere.position = this.position;
+    this.box.position = this.position;
+  };
+  
+  invMass(){
+    if(mass == 0) return 0;
+    return 1 / mass;
+  };
+  
+  addLinearImpulse(impulse){
+    this.velocity = add(this.velocity, impulse);
+  };
+}</code>
+
+<h2>Linear impulse</h2>
+<p>Linear impulses are instantaneous changes in velocity. They are applied to resolve collisions.
+<p><code>// (add the following in rigidbody.js)
+
+// Find collision features
+
+FindCollisionFeatures(ra, rb){
+  var result = collisionManifold();
+  
+  // Between a sphere and...
+  if(ra.type == RIGIDBODY_SPHERE){
+  
+    // ... a sphere
+    if(rb.type == RIGIDBODY_SPHERE){
+      result = findCollisionFeatures(ra.sphere, rb.sphere);
+    }
+    
+    // ... a box 
+    else if(rb.type == RIGIDBODY_BOX){
+      result = findCollisionFeatures(ra.sphere, rb.box);
+    }
+  }
+  
+  // Between a box and...
+  if(ra.type == RIGIDBODY_BOX){
+  
+    // ... a sphere
+    if(rb.type == RIGIDBODY_SPHERE){
+      result = findCollisionFeatures(ra.box, rb.sphere);
+    }
+    
+    // ... a box 
+    else if(rb.type == RIGIDBODY_BOX){
+      result = findCollisionFeatures(ra.box, rb.box);
+    }
+  }
+  
+  return result;
+}
+
+// Apply impulse
+applyImpulse (A, B, M, c){
+  
+  // Linear velocity
+  var invMass1 = A.invMass();
+  var invMass2 = B.invMass();
+  var invMassSum = invMass1 + invMass2;
+  if(invMassSum == 0){ return; }
+  
+  // Relative velocity
+  var relativeVel = sub(B.velocity, A.velocity);
+  
+  // Relative collision normal
+  var relativeNorm = norm(M.normal);
+  
+  // Do nothing if they are moving away from each other
+  if(dot(relativeVel, relativeNorm) > 0){ return; }
+  
+  var e = Math.min(A.cor, B.cor);
+  var numerator = (-(1 + e) * dot(relativeVel, relativeNorm));
+  
+  var j = numerator / invMassSum;
+  if(M.contacts.length > 0 && j != 0){
+    j /= M.contacts.length;
+  }
+  
+  var impulse = scale(relativeNorm, j);
+  A.velocity = sub(A.velocity, scale(impulse, invMass1));
+  B.velocity = add(B.velocity, scale(impulse, invMass2));
+  
+  // Friction
+  var t = sub(relativeVel, scale(relativeNorm, dot(relativeVel, relativeNorm)));
+  if(mags(t) == 0){ return; }
+  t = norm(t);
+  numerator = -dot(relativeVel, t);
+  var jt = numerator / invMassSum;
+  if(M.contacts.length > 0 && jt != 0){
+    jt /= M.contacts.length;
+  }
+  if(jt == 0){ return; }
+  var friction = Math.sqrt(A.friction * B.friction);
+  if(jt > j * friction) {
+    jt = j * friction;
+  }
+  else if(jt &lt; -j * friction){
+    jt = -j * friction;
+  }
+  var tangentImpuse = scale(t, jt);
+  A.velocity = sub(A.velocity, scale(tangentImpuse, invMass1));
+  B.velocity = add(B.velocity, scale(tangentImpuse, invMass2));
+}</code>
+
+<h2>Physics System Update</h2>
+<p>Let's update the physics system to use these new features.
+<p>To avoid "sinking" when two objects are stacked, we will move both objects a little along the collision normal.
+
+
 
 <style>
 body { font: 15px calibri }

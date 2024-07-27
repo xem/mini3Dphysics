@@ -6,7 +6,7 @@ The relevant chapters of the book are summarized [in the pages below](https://gi
 
 The source code is available in the [lib folder](https://github.com/xem/mini3Dphysics/tree/gh-pages/lib)
 
-A micro WebGL renderer is included, based on [W.js](https://xem.github.io/W)
+An optional micro WebGL renderer is included in the lib folder, based on [W.js](https://xem.github.io/W)
 
 # Physics engine API
 
