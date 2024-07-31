@@ -30,17 +30,23 @@
 
 <h2>OBB to OBB</h2>
 
-<p>We will be using the SAT (Separating Axis theorem), that determines if the two OBBs have a gap between them when they get projected on 15 different axis:
+<p>Checking if all points of an OBB are outside another OBB is not sufficient to determine if they collide.
+<p>We will use SAT (the Separating Axis theorem), that determines if the two OBBs have a gap between them when they get projected on 15 different axis:
 <p>- The 3 basis vectors of orientation of the first OBB
-<p>- The 3 basis vectors of orientation of the second OBB
-<p>- The 9 cross-products between the basis vectors of orientation of the first OBB and the second OBB.
+<br>- The 3 basis vectors of orientation of the second OBB
+<br>- The 9 cross-products between the basis vectors of orientation of the first OBB and the second OBB.
 <p>If no gap is found on any of these projections, the boxes are colliding.
 
-<p><code>interval = options => {
+<p><code>// Interval object
+
+interval = options => {
+  options ??= {}
   options.min ??= 0;
   options.max ??= 0;
+  return options;
 }
 
+// Get interval of an OBB on one axis
 getInterval = (obb, axis) => {
   var C = obb.position;     // center
   var E = obb.size;         // Extents
@@ -75,12 +81,14 @@ getInterval = (obb, axis) => {
   return result;
 }
 
+// Check if the OBBs overlap on one axis
 overlapOnAxis = (obb1, obb2, axis) => {
   var a = getInterval(obb1, axis);
   var b = getInterval(obb2, axis); // typo in the book, it says obb1 here
   return (b.min &lt;= a.max) && (a.min &lt;= b.max);
 }
 
+// Check if two OBBs collide
 collisionOBBOBB = (obb1, obb2){
   var o1 = obb1.orientation;
   var o2 = obb2.orientation;
@@ -106,6 +114,9 @@ collisionOBBOBB = (obb1, obb2){
   }
   return true;
 }</code>
+
+<p>Demo
+<p><iframe src=demo3.html width=640 height=530 frameborder=no></iframe>
 
 
 <style>
