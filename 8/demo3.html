@@ -1,16 +1,43 @@
 ﻿<script src="../W/w.min.full.js"></script>
-<canvas id=d3 width=600 height=400></canvas>
-<p>D: <input id=d type=range min=-1 max=1 step=0.01 value=-1>
-X: <input id=x1 type=range min=-90 max=90 step=0.01 value=-90>
-Y: <input id=y1 type=range min=-90 max=90 step=0.01>
-Z: <input id=z1 type=range min=-90 max=90 step=0.01>
+<script src="../lib/shapes.js"></script>
+<script src="../lib/point.js"></script>
+<script src="../lib/vec.js"></script>
+<canvas id=d2 width=600 height=400></canvas>
+<p>
+X: <input id=x1 type=range min=-1 max=1 step=0.01 value=1>
+Y: <input id=y1 type=range min=-1 max=1 step=0.01 value=0>
+Z: <input id=z1 type=range min=-1 max=1 step=0.01 value=0>
+<br>
+W: <input id=w1 type=range min=.1 max=2 step=0.01 value=1>
+H: <input id=h1 type=range min=.1 max=2 step=0.01 value=1>
+D: <input id=d1 type=range min=.1 max=2 step=0.01 value=1>
+<br>
+RX: <input id=rx1 type=range min=-90 max=90 step=0.01 value=0>
+RY: <input id=ry1 type=range min=-90 max=90 step=0.01 value=0>
+RZ: <input id=rz1 type=range min=-90 max=90 step=0.01 value=0>
 <script>
-W.reset(d3);
-W.camera({z:5});
-W.light({x:-.5,y:-.2});
-W.plane({n:"p1",x:0,y:-1,z:0,w:4,h:4,s:1,b:"#88888888",rx:-90});
+W.reset(d2);
+W.camera({z:3});
+W.light({x:.5,y:-.5,z:-.5});
+W.cube({n:"s1",w:1,h:1,d:1,x:.5,y:0,z:0,size:1,s:1,b:"#88888888"});
+W.sphere({n:"s2",x:-1,y:0,z:0,size:.08,s:1,b:"#000000FF"});
+//W.sphere({n:"s3",x:.5-0.02,y:0,z:0,size:.08,s:1,b:"#FF0000FF"});
 W.clearColor("#fed");
-onchange=oninput=()=>W.move({n:"p1",y:+d.value,rx:+x1.value,ry:+y1.value,rz:+z1.value});
+onload=onchange=oninput=()=>{
+  M = (new DOMMatrix()).translate(+x1.value,+y1.value,+z1.value).rotate(+rx1.value,+ry1.value,+rz1.value).scale(+w1.value,+h1.value,+d1.value);
+  Mpoint = (new DOMMatrix()).rotate(+rx1.value,+ry1.value,+rz1.value).translate(+x1.value,+y1.value,+z1.value)
+  W.move({n:"s1",M:M})
+  var point = new DOMPoint(-1,0,0);
+  var o = obb({position: new DOMPoint(+x1.value, +y1.value, +z1.value), size: [+w1.value/2, +h1.value/2, +d1.value/2], orientation: Mpoint});
+  var inside = pointInOBB(o, point);
+  if(inside){
+    W.move({n:"s1",b:"#FF000088"});
+  }
+  else {
+    W.move({n:"s1",b:"#00FF0088"});
+  }
+  //W.move({n:"s3",x:closest.x-.02,y:closest.y,z:closest.z});
+};
 </script>
 <style>
 body { margin: 0 }

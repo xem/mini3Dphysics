@@ -48,7 +48,7 @@
 
 <p>Testing if a point is in an OBB is very similar.
 
-<p><code>pointInOBB = (point, obb){
+<p><code>pointInOBB = (obb, point) => {
   var dir = sub(point, obb.position);
   var axis = [
     new DOMPoint(obb.orientation.m11, obb.orientation.m21, obb.orientation.m31),
@@ -58,6 +58,7 @@
   var dist;
   for(var i = 0; i &lt; 3; i++){
     dist = dot(dir, axis[i]);
+    console.log(i, dist);
     if(dist > obb.size[i]){
       return 0;
     }
@@ -66,7 +67,11 @@
     }
   }
   return 1;
-}</codde>
+}</code>
+
+<p>Demo
+<p><iframe src=demo3.html width=640 height=530 frameborder=no></iframe>
+
 <!--
 <h2>Point and plane</h2>
 The closest point to a test point at the surface of a plane is found by subtracting the signed distance between the test point and the plane from the point's position.
