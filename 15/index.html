@@ -279,7 +279,7 @@ findCollisionFeaturesOBBOBB = (A, B) => {
 }</code>
 
 <h2>Rigidbody modifications</h2>
-<p>(This section adds a type field to Rigidbody.)
+<p>(This section adds a type field to Rigidbody. See code below)
 
 <h2>Linear Velocity</h2>
 <p>Linear velocity moves an object linearly, without rotation (ex: gravity).
@@ -446,7 +446,7 @@ applyImpulse (A, B, M, c){
 }</code>
 
 <h2>Physics System Update</h2>
-<p>Let's update the physics system to use these new features.
+<p>Let's rewrite the physics system to use these new features.
 <p>To avoid "sinking" when two objects are stacked, we will move both objects a little along the collision normal.
 
 <p><code>physicsSystem = {
@@ -541,17 +541,19 @@ applyImpulse (A, B, M, c){
 <p>Each object will be able to rotate around its center (which is also its position).
 <p>The new forces that are introduced are: Angular Acceleration, Angular Velocity, torque and the moment of inertia.
 
-<p>The AAngular velocity is expressed in radians/second, and is the derivative of angular acceleration, expressed in radians/seconds².
+<p>The Angular velocity is expressed in radians/second, and is the derivative of angular acceleration, expressed in radians/seconds².
 <p>The tangential velocity is the derivative of tangential acceleration, which changes the magnitude of the angular velocity.
 <p>The Centripetal Acceleration changes a rotating object's direction over time, but not its velocity.
 <p>Torque means that the further a force is applied from the center of an object, the less force is needed to rotate it.
 <p>The Inertia Tensor is a 3x3 matrix representing the moment of inertia of an object (how much force is needed to rotate it from a given point).
 <p><img src=inertia.png>
 
-<p><code>// in rigidBody
+<p><code>// in rigidBodyVolume
   orientation = new DOMPoint();
   angVel = new DOMPoint();
   torques = new DOMPoint(); // sum
+  
+  // New functions
   
   invTensor() {
     var ix = 0, iy = 0, iz = 0, iw = 0;
@@ -590,7 +592,7 @@ applyImpulse (A, B, M, c){
     this.angvel = add(angVel, angAccel);
   }
   
-  // Update these functions
+  // Updated functions
   synchCollisionVolumes(){
     this.sphere.position = this.position;
     this.box.position = this.position;
@@ -618,7 +620,7 @@ applyImpulse (A, B, M, c){
 
  
 <h2>Angular Impulse</h2>
-<p>Updating rigidBody's applyImpulse to include combination of linear and rotation impulses.
+<p>Let's rewrite rigidBodyVolume's applyImpulse() to include a combination of linear and rotation impulses.
 <p><code>applyImpulse (A, B, M, c){
   
   // Linear velocity
@@ -702,9 +704,8 @@ applyImpulse (A, B, M, c){
   B.velocity = add(B.velocity, scale(tangentImpuse, invMass2));
   A.angVel = sub(A.angVel, mul(cross(r1, tangentImpuse), i1));
   B.angVel = add(B.angVel, mul(cross(r2, tangentImpuse), i2));
-}
-</code>
-<p>See advanced techniques to avoid jittering.
+}</code>
+<p>See the advanced techniques chapter to avoid jittering.
 
 <style>
 body { font: 15px calibri }
