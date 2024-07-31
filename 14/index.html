@@ -8,7 +8,7 @@
 <p>The physics system will store and control all the objects present in the scene.
 <p>These objects are called rigidBodies (they keep their shape, size and mass constant during the simulation).
 
-<p><code>// RigidBody
+<p><code>// RigidBody (to be completed in next chapters)
 
 class rigidBody {
 
@@ -69,7 +69,7 @@ physicsSystem = {
 <h2>Integrating particles</h2>
 
 <p>Integrating consists of guessing where an object will be in a given amount of time based on its current position, velocity, and the forces applied to it.
-<p>Integrating the acceleration in respect to time will update its object's velocity.
+<p>Integrating the acceleration in respect to time will update the object's velocity.
 <p>Then, integrating the velocity in respect to time will update its position.
 <p>These are called Euler integrations and are based on Newton's Laws of Motion:
 <p>1) An object's velocity doesn't change unless it is affected by an external force.
@@ -83,6 +83,14 @@ physicsSystem = {
 <p><code class=f>V<sub>new</sub> = V + AΔt</code>
 <p>- The new position of an object is its previous position plus its velocity scaled over the elapsed time. 
 <p><code class=f>P<sub>new</sub> = P + VΔt</code>
+
+<p>For a more accurate and stable simulation, we can do velocity verlet integration my integrating the object's position using the mean of the previous velocity and the new computed velocity. (skipped for now)
+
+<p><code class=f>P = ((V<sub>old</sub> + V) / 2) Δt</code>
+
+<p>After this section, the book explains how to integrate a group of particles (tiny spheres that can only move, not rotate).
+<p>We will not implement particles in this engine to save space, but the next chapter will include a demo with spheres that do not rotate.
+
 
 <!--<p>Let's begin with particles (rigidBodies with no size), that are only affected by gravity and do not rotate.
 
@@ -137,9 +145,7 @@ class particle extends rigidBody {
   getBounce(){ return this.bounce }
 }</code>
 
-<p>For a more accurate and stable simulation, we can do velocity verlet integration my integrating the object's position using the mean of the previous velocity and the new computed velocity. (skipped for now)
 
-<p><code class=f>P = ((V<sub>old</sub> + V) / 2) Δt</code>
 
 <p>Demo:
 
